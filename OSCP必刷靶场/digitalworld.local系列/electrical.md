@@ -16,7 +16,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](pic-electrical\1.jpg)
+![](./pic-electrical/1.jpg)
 
 # 信息收集
 
@@ -28,7 +28,7 @@
 nmap -sT 192.168.10.12 --min-rate=1000 -p- -oA nmap-tcp
 ```
 
-![](pic-electrical\2.jpg)
+![](./pic-electrical/2.jpg)
 
 扫描常见的20个`udp`端口，不过这里的端口大部分都是不确定的情况
 
@@ -36,7 +36,7 @@ nmap -sT 192.168.10.12 --min-rate=1000 -p- -oA nmap-tcp
 nmap -sU 192.168.10.12 --top-ports 20 -T4 -oA nmap-udp
 ```
 
-![](pic-electrical\3.jpg)
+![](./pic-electrical/3.jpg)
 
 把前面扫描出的`tcp、udp`端口，进行处理，只取端口号
 
@@ -46,7 +46,7 @@ grep open nmap-tcp.nmap | awk -F'/' '{print $1}' | paste -sd ','
 ports=22,80,8080,68,69,138,161,631,1434,1900
 ```
 
-![](pic-electrical\4.jpg)
+![](./pic-electrical/4.jpg)
 
 对特定的端口号进行深入探测
 
@@ -54,11 +54,11 @@ ports=22,80,8080,68,69,138,161,631,1434,1900
 nmap -sV -O -sC -sT 192.168.10.12 -p $ports -oA detail
 ```
 
-![](pic-electrical\5.jpg)
+![](./pic-electrical/5.jpg)
 
-![6](pic-electrical\6.jpg)
+![](./pic-electrical/6.jpg)
 
-![7](pic-electrical\7.jpg)
+![](./pic-electrical/7.jpg)
 
 使用脚本检测有无漏洞
 
@@ -66,15 +66,15 @@ nmap -sV -O -sC -sT 192.168.10.12 -p $ports -oA detail
 nmap --script=vuln 192.168.10.12 -p $ports -oA vuln
 ```
 
-![](pic-electrical\8.jpg)
+![](./pic-electrical/8.jpg)
 
 ## SMB探测
 
 使用`enum4linux`尝试进行枚举，发现两个分享`print$`和`IPC$`，并还有两个用户`govindasamy`和`electrical`
 
-![](./pic-electrical\9.jpg)
+![](././pic-electrical/9.jpg)
 
-![10](pic-electrical\10.jpg)
+![10](./pic-electrical/10.jpg)
 
 ## 8834端口探测
 
@@ -84,7 +84,7 @@ nmap --script=vuln 192.168.10.12 -p $ports -oA vuln
 https://192.168.10.12:8834
 ```
 
-![](pic-electrical/11.jpg)
+![](./pic-electrical/11.jpg)
 
 查看页面源代码也没有信息泄露，那么尝试识别一下，使用`whatweb`测试
 

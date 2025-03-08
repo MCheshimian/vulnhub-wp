@@ -10,7 +10,7 @@
 
 使用`arp-scan -l`扫描
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\1.jpg)
+![](./pic-1/1.jpg)
 
 
 
@@ -18,7 +18,7 @@
 
 ## 使用nmap扫描
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\2.jpg)
+![](./pic-1/2.jpg)
 
 
 
@@ -26,41 +26,41 @@
 
 访问默认界面，查看页面源码无泄露，不过确定图片是放在网站目录，也就是网站是目录型网站
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\3.jpg)
+![](./pic-1/3.jpg)
 
 使用`dirsearch、gobuster、ffuf、dirb、dirbuster`等工具进行目录扫描，这里`gobuster`的扫描与之差不多
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\4.jpg)
+![](./pic-1/4.jpg)
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\5.jpg)
+![](./pic-1/5.jpg)
 
 使用`whatweb`搜集网站信息
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\6.jpg)
+![](./pic-1/6.jpg)
 
 这是一个手册，关于`apache`的，访问查看，并无任何内容，只是`apache`的手册
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\7.jpg)
+![](./pic-1/7.jpg)
 
 
 
 访问`js`目录，发现有`js`代码，并且函数接收等
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\8.jpg)
+![](./pic-1/8.jpg)
 
 返回主页面，再次查看有无调用`js`中的函数`viewDetails`
 
 看到四个图片的每一张都调用了这个函数，点击之后可以看到图片的详细信息
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\9.jpg)
+![](./pic-1/9.jpg)
 
 
 
 查看图片信息
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\10.jpg)
+![](./pic-1/10.jpg)
 
-![11](D:\stu\vulnhub\momentum靶场\pic-1\11.jpg)
+![11](./pic-1/11.jpg)
 
 # 漏洞寻找
 
@@ -72,11 +72,11 @@
 
 这里运行脚本检测，可以看到有效载荷生效，并且十分确认，这时候复制`payload`验证即可
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\13.jpg)
+![](./pic-1/13.jpg)
 
 在浏览器复制`payload`进行验证，发现确实有，说明有`xss`漏洞
 
-![13](D:\stu\vulnhub\momentum靶场\pic-1\12.jpg)
+![13](./pic-1/12.jpg)
 
 
 
@@ -86,11 +86,11 @@
 
 启动`beef-xss`
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\14.jpg)
+![](./pic-1/14.jpg)
 
 
 
-这里给出了`hook`的代码，修改即可使用，修改成攻击者`kali`的`ip`地址，然后浏览器访问后，可以看到在`beef-xss`中显示出![](D:\stu\vulnhub\momentum靶场\pic-1\15.jpg)
+这里给出了`hook`的代码，修改即可使用，修改成攻击者`kali`的`ip`地址，然后浏览器访问后，可以看到在`beef-xss`中显示出![](./pic-1/15.jpg)
 
 经历了一番尝试，在`beef-xss`上可以操纵浏览器行为，但是无法获取到有用信息，除了`cookie`
 
@@ -98,13 +98,13 @@
 
 选择查看配置代码
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\16.jpg)
+![](./pic-1/16.jpg)
 
 
 
 然后选择一个语句复制，然后粘贴到有xss漏洞的地方
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\17.jpg)
+![](./pic-1/17.jpg)
 
 
 
@@ -116,11 +116,11 @@ cookie=U2FsdGVkX193yTOKOucUbHeDp1Wxd5r7YkoM8daRtj0rjABqGuQ6Mx28N1VbBSZt; BEEFHOO
 
 
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\18.jpg)
+![](./pic-1/18.jpg)
 
 如上所说，暂时无其他可用，返回之前的信息搜索，其中访问`js`时不止有函数，下面还有一段代码，虽然被注释，但是可以看出是`AES`加解密的。
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\19.jpg)
+![](./pic-1/19.jpg)
 
 `crypto-js` 是一个纯 `javascript` 写的加密算法类库 ，这里就是通过该库进行解密
 
@@ -135,13 +135,13 @@ CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: Cryp
 
 尝试进行解密，在网站`https://www.sojson.com/encrypt_aes.html`，解密出`auxerre-alienum##`
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\20.jpg)
+![](./pic-1/20.jpg)
 
 # ssh登录
 
 获得一个密码，因为在`cookie`中，猜测可能是用户名-密码的形式，使用ssh登录`auxerre`测试，发现确实有该用户，不过密码不是后面的，而是解密出的一整个文本`auxerre-alienum##`
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\21.jpg)
+![](./pic-1/21.jpg)
 
 
 
@@ -149,31 +149,31 @@ CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: Cryp
 
 在使用`find`寻找具有`SUID`权限没有内容后，再寻找可能隐藏或敏感文件，也没有发现，那就查看端口连接情况`ss -antlp`，发现`6379`端口，该端口默认是`redis`服务
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\22.jpg)
+![](./pic-1/22.jpg)
 
 测试有无`redis-cli`命令，发现有，可以查看帮助
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\23.jpg)
+![](./pic-1/23.jpg)
 
 
 
 可以看到默认情况下与现在的条件吻合，那么就不需要指定主机和端口，直接输入`redis-cli`即可连接，若无密码，则可以直接登录，进行测试，登录成功，并且获取到几个键。
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\24.jpg)
+![](./pic-1/24.jpg)
 
 获取其中的值，说是`rootpass`，使用密码`m0mentum-al1enum##`连接进行测试
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\25.jpg)
+![](./pic-1/25.jpg)
 
 直接另起终端`ssh`连接，发现不行，可能设置不允许`ssh`登录等情况
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\26.jpg)
+![](./pic-1/26.jpg)
 
 
 
 之前使用`find`寻找SUID权限的文件时，有`su`命令，直接使用`su`命令切换进行测试
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\27.jpg)
+![](./pic-1/27.jpg)
 
 
 
@@ -183,9 +183,9 @@ CryptoJS.AES.decrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: Cryp
 
 # 清除痕迹
 
-![](D:\stu\vulnhub\momentum靶场\pic-1\28.jpg)
+![](./pic-1/28.jpg)
 
-![29](D:\stu\vulnhub\momentum靶场\pic-1\29.jpg)
+![29](./pic-1/29.jpg)
 
 
 

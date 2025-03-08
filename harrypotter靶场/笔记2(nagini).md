@@ -12,7 +12,7 @@
 
 使用`arp-scan -l`扫描，确保在同一网卡
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\1.jpg)
+![](./pic-nagini/1.jpg)
 
 # 信息收集
 
@@ -20,7 +20,7 @@
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\2.jpg)
+![](./pic-nagini/2.jpg)
 
 
 
@@ -34,7 +34,7 @@
 
 使用`whatweb`探测
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\3.jpg)
+![](./pic-nagini/3.jpg)
 
 
 
@@ -42,25 +42,25 @@
 
 检测到`joomla`可能是CMS，访问查看
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\4.jpg)
+![](./pic-nagini/4.jpg)
 
 
 
 先访问默认界面，没有任何东西，下载图片也没有隐藏信息
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\4-1.jpg)
+![](./pic-nagini/4-1.jpg)
 
 访问`note.txt`文件，说是使用新的`http3`服务器，给出网址`https://quic.nagini.hogwarts`，通过这个进行进一步的通信，所有开发人员都被要求定期访问服务器以检测最新公告。最后给出来信人`site_admin`。可能存在用户`admin`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\8.jpg)
+![](./pic-nagini/8.jpg)
 
 访问确实是`joomla`的CMS
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\5.jpg)
+![](./pic-nagini/5.jpg)
 
 查看页面源码，发现有几个隐藏的输入
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\6.jpg)
+![](./pic-nagini/6.jpg)
 
 
 
@@ -74,7 +74,7 @@ joomscan -u http://192.168.1.101
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\7.jpg)
+![](./pic-nagini/7.jpg)
 
 
 
@@ -84,23 +84,23 @@ joomscan -u http://192.168.1.101
 joomscan -u http://192.168.1.101/joomla/ 
 ```
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\7-1.jpg)
+![](./pic-nagini/7-1.jpg)
 
-![7-2](D:\stu\vulnhub\harrypotter靶场\pic-nagini\7-2.jpg)
+![7-2](./pic-nagini/7-2.jpg)
 
 
 
 找到两个文件，访问`robots.txt`查看，发现是一些目录
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\9.jpg)
+![](./pic-nagini/9.jpg)
 
 再访问备份文件`http://192.168.1.101/joomla/configuration.php.bak`
 
 下载后查看内容
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\10.jpg)
+![](./pic-nagini/10.jpg)
 
-![11](D:\stu\vulnhub\harrypotter靶场\pic-nagini\11.jpg)
+![11](./pic-nagini/11.jpg)
 
 
 
@@ -156,11 +156,11 @@ cd /quiche/target/debug/examples	#切换到创建的环境
 
 查看页面源码后，以`id=url`接收输入后
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\12.jpg)
+![](./pic-nagini/12.jpg)
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\13.jpg)
+![](./pic-nagini/13.jpg)
 
 
 
@@ -170,13 +170,13 @@ cd /quiche/target/debug/examples	#切换到创建的环境
 
 可以看到`php`有参数接收，可以直接测试`file://`读取文件格式
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\14.jpg)
+![](./pic-nagini/14.jpg)
 
 ## SSRF之gopher协议
 
 存在`SSRF`漏洞，测试`gopher`协议
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\15.jpg)
+![](./pic-nagini/15.jpg)
 
 
 
@@ -194,25 +194,25 @@ cd Gopherus
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\16.jpg)
+![](./pic-nagini/16.jpg)
 
 
 
 使用这个`payload`多测试几遍，就会出现
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\17.jpg)
+![](./pic-nagini/17.jpg)
 
 ## SSRF---gopher之数据库
 
 发现数据库中的一个表
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\18.jpg)
+![](./pic-nagini/18.jpg)
 
 
 
 多次尝试该`payload`，查询到`site_admin`用户
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\19.jpg)
+![](./pic-nagini/19.jpg)
 
 密码`$2y$10$cmQ.akn2au104AhR4.YJBOC5W13gyV21D/bkoTmbWWqFWjzEW7vay`
 
@@ -226,19 +226,19 @@ echo -n "123456" | md5sum
 
 使用`gopherus`工具生成，更新信息的命令
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\20.jpg)
+![](./pic-nagini/20.jpg)
 
 
 
 多次使用`payload`，出现下面后，成功修改
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\21.jpg)
+![](./pic-nagini/21.jpg)
 
 ## 网站管理登录
 
 访问之前的`joomla/administrator`路径，使用`site_admin`用户和密码`123456`进行登录
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\22.jpg)
+![](./pic-nagini/22.jpg)
 
 这个界面就可以操作很多东西，在扩展处，有模板，可以在这里进行设置，这里在站点的默认界面进行插入一句话代码
 
@@ -248,13 +248,13 @@ echo -n "123456" | md5sum
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\23.jpg)
+![](./pic-nagini/23.jpg)
 
 
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\24.jpg)
+![](./pic-nagini/24.jpg)
 
 
 
@@ -262,13 +262,13 @@ echo -n "123456" | md5sum
 
 使用蚁🗡连接即可，当然也可以使用`kali`中的模块`/usr/share/webshells/php/php-reverse-shell.php`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\25.jpg)
+![](./pic-nagini/25.jpg)
 
 
 
 整个文件中的代码复制到目标
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\26.jpg)
+![](./pic-nagini/26.jpg)
 
 
 
@@ -276,7 +276,7 @@ echo -n "123456" | md5sum
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\27.jpg)
+![](./pic-nagini/27.jpg)
 
 
 
@@ -284,13 +284,13 @@ echo -n "123456" | md5sum
 
 切换到`/home`目录，看到文本，应该是密码，通过`base64`进行解码
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\28.jpg)
+![](./pic-nagini/28.jpg)
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\28-1.jpg)
+![](./pic-nagini/28-1.jpg)
 
 尝试进入`.ssh`目录，查看有无私钥等，发现无权
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\29.jpg)
+![](./pic-nagini/29.jpg)
 
 
 
@@ -298,17 +298,17 @@ echo -n "123456" | md5sum
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\30.jpg)
+![](./pic-nagini/30.jpg)
 
 切换到这个目录查看，发现有个`txt`文件，并且无权查看。`su_cp`是一个可执行文件
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\31.jpg)
+![](./pic-nagini/31.jpg)
 
 
 
 测试，并查看帮助
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\32.jpg)
+![](./pic-nagini/32.jpg)
 
 # 提权
 
@@ -316,7 +316,7 @@ echo -n "123456" | md5sum
 
 因为每个用户目录下都有`.ssh`文件，那么就在`kali`上生成一个`ssh`钥匙对
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\33.jpg)
+![](./pic-nagini/33.jpg)
 
 
 
@@ -330,13 +330,13 @@ echo -n "123456" | md5sum
 
 然后使用该命令把公钥复制到`.ssh`目录下
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\34.jpg)
+![](./pic-nagini/34.jpg)
 
 
 
 可以看到把在`kali`中已经生成的公钥作为用户`hermonine`的`ssh`配置中为已认证的，所以使用`kali`指定私钥文件直接连接即可
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\35.jpg)
+![](./pic-nagini/35.jpg)
 
 
 
@@ -344,7 +344,7 @@ echo -n "123456" | md5sum
 
 先是使用`find`寻找具有`SUID`的，发现除了那个`su_cp`没有其他可用的了，但是这个也无法复制`/etc/shadow`，所以`hash`破解是不行了，查看当前目录所有文件，看到有一个`.mozilla`文件夹
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\36.jpg)
+![](./pic-nagini/36.jpg)
 
 
 
@@ -354,33 +354,33 @@ echo -n "123456" | md5sum
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\37.jpg)
+![](./pic-nagini/37.jpg)
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\38.jpg)
+![](./pic-nagini/38.jpg)
 
 
 
 在本地尝试进行破解其中的加密，找了好久，没有找到加密算法，所以查看搜索一下，发现使用工具`firefox_decrypt`即可。项目地址`https://github.com/unode/firefox_decrypt.git`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\39.jpg)
+![](./pic-nagini/39.jpg)
 
 
 
 使用`firefox_decrypt`指定`profiles.ini`所在父目录即可
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\40.jpg)
+![](./pic-nagini/40.jpg)
 
 提权到`root`成功
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\41.jpg)
+![](./pic-nagini/41.jpg)
 
 # 清除痕迹
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-nagini\42.jpg)
+![](./pic-nagini/42.jpg)
 
 
 

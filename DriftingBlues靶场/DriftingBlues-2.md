@@ -10,19 +10,19 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.1.1/24`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\1.jpg)
+![](./pic-2/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\2.jpg)
+![](./pic-2/2.jpg)
 
 ## 网站探测
 
 访问80端口，只有背景图，查看页面源代码，也是如此
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\3.jpg)
+![](./pic-2/3.jpg)
 
 尝试进行目录扫描
 
@@ -34,19 +34,19 @@ gobuster dir -u http://192.168.1.59 -w /usr/share/wordlists/dirb/big.txt -x php,
 
 当然这里使用`gobuster`只是进行一层目录扫描，不深入，想要深入，可以使用`dirsearch、dirb`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\4.jpg)
+![](./pic-2/4.jpg)
 
 使用`dirb`效果演示
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\5.jpg)
+![](./pic-2/5.jpg)
 
 访问`/blog`目录，发现在连接时，在连接一个域名，并且，内容加载有问题，猜测可能需要绑定解析
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\6.jpg)
+![](./pic-2/6.jpg)
 
 使用`whatweb`进行指纹识别，确定CMS为`wordpress`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\7.jpg)
+![](./pic-2/7.jpg)
 
 使用针对`wordpress`的扫描工具`wpscan`
 
@@ -54,7 +54,7 @@ gobuster dir -u http://192.168.1.59 -w /usr/share/wordlists/dirb/big.txt -x php,
 wpscan --url http://192.168.1.59/blog
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\8.jpg)
+![](./pic-2/8.jpg)
 
 # 漏洞寻找
 
@@ -66,7 +66,7 @@ wpscan --url http://192.168.1.59/blog -e u
 
 发现用户`albert`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\9.jpg)
+![](./pic-2/9.jpg)
 
 尝试进行爆破，出现密码，用户名`albert`，密码`scotland1`
 
@@ -74,35 +74,35 @@ wpscan --url http://192.168.1.59/blog -e u
 wpscan --url http://192.168.1.59/blog -e u -P /usr/share/wordlists/rockyou.txt 
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\12.jpg)
+![](./pic-2/12.jpg)
 
 访问`/blog/wp-admin`时，发现跳转域名，需要进行绑定，修改`/etc/hosts`文件后，可正常访问
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\11.jpg)
+![](./pic-2/11.jpg)
 
 # 漏洞利用
 
 登录测试，发现登录成功，测试查看插件，发现一个插件，把该插件启用
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\13.jpg)
+![](./pic-2/13.jpg)
 
 然后编辑这个插件，测试能否修改，发现可以修改
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\14.jpg)
+![](./pic-2/14.jpg)
 
 把`kali`中的脚本`/usr/share/webshells/php/php-reverse-shell.php`复制到这里面，脚本中的`ip`是`kali`的ip地址
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\15.jpg)
+![](./pic-2/15.jpg)
 
 在`kali`中开启监听端口`1234`，浏览器刷新即可，因为这个插件就是用户登录后的右上角，打招呼`hello`的
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\16.jpg)
+![](./pic-2/16.jpg)
 
 # 靶机内信息收集
 
 使用`compgen -c`或者`dpkg -l | grep python`，查看有无安装`python`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\17.jpg)
+![](./pic-2/17.jpg)
 
 使用`python`获取一个交互式界面
 
@@ -112,7 +112,7 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 
 使用`find`寻找具有SUID权限文件，发现`sudo`，但是需要密码
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\18.jpg)
+![](./pic-2/18.jpg)
 
 使用`find`寻找`capabilities`，并无可用
 
@@ -120,19 +120,19 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 find / -type f -executable 2>/dev/null | xargs getcap -r 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\18-1.jpg)
+![](./pic-2/18-1.jpg)
 
 去网站目录下查看`wp-config.php`连接数据库的时候，有无使用靶机内的用户及密码，
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\19.jpg)
+![](./pic-2/19.jpg)
 
 查看当前靶机内的用户，只有`freddie`和`root`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\20.jpg)
+![](./pic-2/20.jpg)
 
 到该用户的主目录，发现在其下的`.ssh`文件夹中的私钥文件`id_rsa`可读
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\21.jpg)
+![](./pic-2/21.jpg)
 
 # 提权
 
@@ -140,17 +140,17 @@ find / -type f -executable 2>/dev/null | xargs getcap -r 2>/dev/null
 
 把私钥文件`id_rsa`下载到`kali`或者复制到`kali`，然后指定该文件登录到`freddie`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\22.jpg)
+![](./pic-2/22.jpg)
 
 突然想起之前的`ftp`端口打开，测试能否匿名访问，空密码登录成功
 
 下载一个图片，测试有无隐藏信息，测试发现没有内容
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\23.jpg)
+![](./pic-2/23.jpg)
 
 那么就继续以`freddie`的`ssh`登录为主
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\24.jpg)
+![](./pic-2/24.jpg)
 
 ## 提权至root
 
@@ -158,13 +158,13 @@ find / -type f -executable 2>/dev/null | xargs getcap -r 2>/dev/null
 
 发现可以，不需要密码
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\25.jpg)
+![](./pic-2/25.jpg)
 
 这里就可以使用`nmap`通过`sudo`进行提权，因为这里不需要密码了。
 
 那么如果不知道如何使用提权，可以查看网站`gtfobins.github.io`搜索使用
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\26.jpg)
+![](./pic-2/26.jpg)
 
 根据条件满足去使用，或者两种方法都测试也行，反正方法不多
 
@@ -182,7 +182,7 @@ nmap> !sh
 第一种提权，在输入命令时，是看不到的，只能看到输出
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-2\27.jpg)
+![](./pic-2/27.jpg)
 
 # 清除痕迹
 

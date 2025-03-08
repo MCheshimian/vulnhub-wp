@@ -16,7 +16,7 @@
 
 当然，如果想要模拟真实渗透，建议使用`nmap`等扫描工具
 
-![](D:\stu\vulnhub\DC靶场\pic-6\1.jpg)
+![](./pic-6/1.jpg)
 
 使用`nmap`扫描`192.168.10.0`网段中的存活主机
 
@@ -24,7 +24,7 @@
 nmap -sn 192.168.10.1/24
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\2.jpg)
+![](./pic-6/2.jpg)
 
 # 信息收集 
 
@@ -36,21 +36,21 @@ nmap -sn 192.168.10.1/24
 nmap -sV -O 192.168.10.10 -p-
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\3.jpg)
+![](./pic-6/3.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，输入`ip`地址，跳转到`wordy`，说明可能是域名，需要进行绑定解析
 
-![](D:\stu\vulnhub\DC靶场\pic-6\4.jpg)
+![](./pic-6/4.jpg)
 
 编辑`/etc/hosts`文件，在其中添加`ip`以及域名进行绑定
 
-![](D:\stu\vulnhub\DC靶场\pic-6\5.jpg)
+![](./pic-6/5.jpg)
 
 再次访问网站，发现默认界面中的信息，发现CMS可能为`wordpress`
 
-![](D:\stu\vulnhub\DC靶场\pic-6\6.jpg)
+![](./pic-6/6.jpg)
 
 使用`whatweb`进一步进行探测，确定为`wordpress`，版本为`5.1.1`
 
@@ -58,7 +58,7 @@ nmap -sV -O 192.168.10.10 -p-
 whatweb http://wordy
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\7.jpg)
+![](./pic-6/7.jpg)
 
 那么这里就可以使用针对CMS为`wordpress`的扫描工具`wpscan`
 
@@ -66,7 +66,7 @@ whatweb http://wordy
 wpscan --url http://wordy
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\8.jpg)
+![](./pic-6/8.jpg)
 
 # 漏洞寻找
 
@@ -76,7 +76,7 @@ wpscan --url http://wordy
 wpscan --url http://wordy -e u
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\9.jpg)
+![](./pic-6/9.jpg)
 
 尝试对这些用户进行密码爆破
 
@@ -96,7 +96,7 @@ wpscan --url http://wordy --detection-mode aggressive --plugins-detection aggres
 
 发现有三个插件，版本信息也都给出
 
-![](D:\stu\vulnhub\DC靶场\pic-6\10.jpg)
+![](./pic-6/10.jpg)
 
 使用`searchsploit`搜索有无对应的版本漏洞，最终确定`plainview`插件存在，但是需要认证后才能使用该漏洞
 
@@ -104,7 +104,7 @@ wpscan --url http://wordy --detection-mode aggressive --plugins-detection aggres
 searchsploit plainview
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\11.jpg)
+![](./pic-6/11.jpg)
 
 但是这里还没有获取到密码，啧，这里去网上看了以下`wp`，确定是不是字典的问题，发现，在该靶机的主页，作者给出了提示。
 
@@ -137,7 +137,7 @@ cat /usr/share/wordlists/rockyou.txt |grep k01 > passwords.txt
 wpscan --url http://wordy -e u -P passwords.txt
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\12.jpg)
+![](./pic-6/12.jpg)
 
 爆出用户名`mark`和密码`helpdesk01`
 
@@ -151,15 +151,15 @@ cat /usr/share/exploitdb/exploits/php/webapps/45274.html
 
 这是自己构造的`html`界面，不过这里通过访问这个插件，发现也是可行的
 
-![](D:\stu\vulnhub\DC靶场\pic-6\13.jpg)
+![](./pic-6/13.jpg)
 
 这里我就不用提供的`html`，自己去访问靶机中的地址，然后按照顺序点击，可以看到，`id`命令执行成功
 
-![](D:\stu\vulnhub\DC靶场\pic-6\14.jpg)
+![](./pic-6/14.jpg)
 
 那么尝试构造一个反弹`shell`，测试是否能够成功，在尝试进行输入时，这里的输入框进行了一个长度的限制，所以需要借助浏览器开发者工具，修改其最大长度，这里默认是15，不过想改多大就多大
 
-![](D:\stu\vulnhub\DC靶场\pic-6\15.jpg)
+![](./pic-6/15.jpg)
 
 再经过测试，使用`bash`反弹，我这里未能成功，采用`nc`反弹成功获取`shell`
 
@@ -179,7 +179,7 @@ nc -lvvp 9999
 
 然后在浏览器的界面中，点击`lookup`按钮，即可发现，反弹`shell`成功
 
-![](D:\stu\vulnhub\DC靶场\pic-6\16.jpg)
+![](./pic-6/16.jpg)
 
 使用`dpkg`获取靶机安装的`python`版本
 
@@ -189,7 +189,7 @@ dpkg -l | grep python
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\17.jpg)
+![](./pic-6/17.jpg)
 
 # 提取
 
@@ -202,7 +202,7 @@ ls -ls /home
 cat /etc/passwd | grep /bin/bash
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\18.jpg)
+![](./pic-6/18.jpg)
 
 发现用户名`mark`，尝试使用之前获取的其密码`helpdesk01`进行`ssh`登录，发现不能登录
 
@@ -210,11 +210,11 @@ cat /etc/passwd | grep /bin/bash
 
 记录添加用户名`graham`，恰好这里的靶机内就有该用户，那么猜测后面的是其密码
 
-![](D:\stu\vulnhub\DC靶场\pic-6\19.jpg)
+![](./pic-6/19.jpg)
 
 使用该用户`graham`和密码`GSo7isUM1D4`进行`ssh`登录，发现成功
 
-![](D:\stu\vulnhub\DC靶场\pic-6\20.jpg)
+![](./pic-6/20.jpg)
 
 ## 提权至用户jens
 
@@ -224,11 +224,11 @@ cat /etc/passwd | grep /bin/bash
 find / -type f -perm -u=s 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\21.jpg)
+![](./pic-6/21.jpg)
 
 查看该脚本文件，发现其他用户没有修改权限，不过这个组和用户不一样，就使用`groups`查看一下，发现两个用户`graham`和`jens`所属同一组`devs`
 
-![](D:\stu\vulnhub\DC靶场\pic-6\22.jpg)
+![](./pic-6/22.jpg)
 
 修改脚本文件，在其中添加`/bin/bash`即可，然后以`jens`执行`sudo`
 
@@ -236,17 +236,17 @@ find / -type f -perm -u=s 2>/dev/null
 sudo -u jens /home/jens/./backups.sh 
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\23.jpg)
+![](./pic-6/23.jpg)
 
 # 提权至root
 
 提权至`jens`后，随手测试一下`sudo -l`，发现无需密码，并发现提权方式了
 
-![](D:\stu\vulnhub\DC靶场\pic-6\24.jpg)
+![](./pic-6/24.jpg)
 
 如果不知道如何使用`nmap`命令提权，可以借助网站`gtfobins.github.io`搜索方式
 
-![](D:\stu\vulnhub\DC靶场\pic-6\25.jpg)
+![](./pic-6/25.jpg)
 
 经测试，发现`--interactive`并无，所以无法使用第二个进行提取
 
@@ -258,7 +258,7 @@ echo 'os.execute("/bin/bash")' > $TF
 sudo nmap --script=$TF
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-6\26.jpg)
+![](./pic-6/26.jpg)
 
 
 

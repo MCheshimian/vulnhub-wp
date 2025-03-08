@@ -18,7 +18,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](/pic-bravey\1.jpg)
+![](./pic-bravey/1.jpg)
 
 # 信息收集
 

@@ -16,7 +16,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\1.jpg)
+![](./pic/1.jpg)
 
 # 信息收集
 
@@ -26,9 +26,9 @@
 nmap -sV -O 192.168.10.11 -p-
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\2.jpg)
+![](./pic/2.jpg)
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\3.jpg)
+![](./pic/3.jpg)
 
 进一步构造语句测试
 
@@ -36,7 +36,7 @@ nmap -sV -O 192.168.10.11 -p-
 nmap -sV -O 192.168.10.11 -p 22,80,1898 -sC
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\4.jpg)
+![](./pic/4.jpg)
 
 
 
@@ -44,7 +44,7 @@ nmap -sV -O 192.168.10.11 -p 22,80,1898 -sC
 
 访问80端口，这给出的相当于提示，页面源代码中也并未有其他内容
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\5.jpg)
+![](./pic/5.jpg)
 
 访问`1898`端口，之气在使用`nmap`的默认脚本扫描，发现一些内容，进行验证测试
 
@@ -52,11 +52,11 @@ nmap -sV -O 192.168.10.11 -p 22,80,1898 -sC
 
 这个插件可以通过浏览器插件下载，各个浏览器都有
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\6.jpg)
+![](./pic/6.jpg)
 
 使用`whatweb`也是识别出
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\7.jpg)
+![](./pic/7.jpg)
 
 使用`gobuster`爆破目录
 
@@ -64,7 +64,7 @@ nmap -sV -O 192.168.10.11 -p 22,80,1898 -sC
 gobuster dir -u http://192.168.10.11:1898 -w /usr/share/wordlists/dirb/big.txt -x php,bak,txt,js,html -b 403-404
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\8.jpg)
+![](./pic/8.jpg)
 
 再使用`dirsearch`其默认字典试试
 
@@ -72,29 +72,29 @@ gobuster dir -u http://192.168.10.11:1898 -w /usr/share/wordlists/dirb/big.txt -
 dirsearch -u http://192.168.10.11:1898 -x 403,404 -e zip,gz
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\9.jpg)
+![](./pic/9.jpg)
 
 访问`robots.txt`，其中包含甚多
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\10.jpg)
+![](./pic/10.jpg)
 
 测试多个，访问也只发现版本`7.54`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\11.jpg)
+![](./pic/11.jpg)
 
 # 漏洞寻找
 
 在主页发现一个文章，有点东西
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\12.jpg)
+![](./pic/12.jpg)
 
 点击查看，发现`http`的请求，是在`robots.txt`中不允许的访问
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\13.jpg)
+![](./pic/13.jpg)
 
 那么就访问`node/2`进行测试，发现两个文件，并且还有提示，应该是隐写
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\14.jpg)
+![](./pic/14.jpg)
 
 直接构造链接测试访问
 
@@ -114,11 +114,11 @@ http://192.168.10.11:1898/LuizGonzaga-LampiaoFalou.mp3
 zbarimg qrc.png
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\15.jpg)
+![](./pic/15.jpg)
 
 测试上面的`audio.m4a`文件，并非隐写，而是直接语音读出`user:tiago`，则，这个信息就是在主文章界面中的文章作者
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\16.jpg)
+![](./pic/16.jpg)
 
 # 获取shell
 
@@ -136,7 +136,7 @@ cewl http://192.168.10.11:1898 -w pass.txt -m 3
 
 这里的登录时的表单数据，是通过浏览器抓取的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\17.jpg)
+![](./pic/17.jpg)
 
 那么再测试`ssh`一下，获取到密码`Virgulino`
 
@@ -144,11 +144,11 @@ cewl http://192.168.10.11:1898 -w pass.txt -m 3
 hydra -l tiago -P pass.txt 192.168.10.11 ssh
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\18.jpg)
+![](./pic/18.jpg)
 
 以这个进行测试登录，发现可以成功登录
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\19.jpg)
+![](./pic/19.jpg)
 
 ## CMS漏洞获取shell
 
@@ -166,7 +166,7 @@ search drupal 7
 use 1
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\21.jpg)
+![](./pic/21.jpg)
 
 ```shell
 options
@@ -175,7 +175,7 @@ set rport 1898
 run
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\22.jpg)
+![](./pic/22.jpg)
 
 # 靶机内信息收集
 
@@ -187,11 +187,11 @@ run
 find / -perm -4000 -print 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\24.jpg)
+![](./pic/24.jpg)
 
 切换之前`ssh`登录的，测试，也是没有`sudo`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\25.jpg)
+![](./pic/25.jpg)
 
 查看定时任务，网络状态、进程等等信息，最好可以上传`pspy64`进行检测
 
@@ -200,14 +200,14 @@ cat /etc/crontab
 ls -l /etc/cron.d
 ````
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\26.jpg)
+![](./pic/26.jpg)
 
 ```shell
 ss -antlp
 ip add
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\27.jpg)
+![](./pic/27.jpg)
 
 ```shell
 ps -aux
@@ -217,13 +217,13 @@ df -h
 
 收集内核信息和操作系统信息
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\28.jpg)
+![](./pic/28.jpg)
 
 # 提权
 
 使用`searchsploit`搜索有无内核版本提权漏洞，发现有几个合适的，需要进一步进行测试
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\29.jpg)
+![](./pic/29.jpg)
 
 在靶机内使用`gcc -v`测试，发现靶机内可以使用`gcc`，那么可以把`c`文件通过`python`和`wget`等搭配，不过测试发现，不行，把在`kali`编译好的文件，上传到靶机去执行，也是不可以的。
 
@@ -236,11 +236,11 @@ df -h
 > - 一般来说，内核版本在 3.13 到 4.8 之间的 Linux 系统都可能存在风险，Ubuntu 14.04 默认使用的是 3.13.x 系列内核，在未打补丁前是受影响的。
 > - 虽然脏牛漏洞主要影响特定的内核版本，但它利用的是内核的内存管理机制中的一个相对通用的特性。许多内核版本可能都采用了相似的内存管理和写时复制机制，只是在细节上有些许差异。即使不是完全相同的内核版本，只要这些内核使用了类似的内存管理代码和逻辑，就有可能受到影响。
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\30.jpg)
+![](./pic/30.jpg)
 
 使用`searchsploit`进一步进行测试，因为这个漏洞搜索，就是根据`exploit`漏洞库的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\31.jpg)
+![](./pic/31.jpg)
 
 经测试，发现只有`40847.cpp`是可用的，因为我该测试都测试了
 
@@ -251,7 +251,7 @@ g++ -Wall -pedantic -O2 -std=c++11 -pthread -o dcow 40847.cpp -lutil
 ./dcow -s
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\32.jpg)
+![](./pic/32.jpg)
 
 那么这时候测试，发现靶机内可以使用`g++`，把文件下载到靶机内，这里采用`ssh`连接后的用户`tiago`，采用`scp`传输，在`kali`中执行
 
@@ -259,11 +259,11 @@ g++ -Wall -pedantic -O2 -std=c++11 -pthread -o dcow 40847.cpp -lutil
 scp 40847.cpp tiago@192.168.10.11:/tmp
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\33.jpg)
+![](./pic/33.jpg)
 
 然后执行上面的用法即可
 
-![](D:\stu\vulnhub\OSCP必刷靶场\lampiao靶场\pic\34.jpg)
+![](./pic/34.jpg)
 
 # 总结
 

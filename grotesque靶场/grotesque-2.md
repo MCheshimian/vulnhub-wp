@@ -14,7 +14,7 @@
 netdiscover -r 192.168.1.1/24	指定网络范围
 ```
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\1.jpg)
+![](./pic-2/1.jpg)
 
 
 
@@ -24,7 +24,7 @@ netdiscover -r 192.168.1.1/24	指定网络范围
 
 后面端口也开启，一直到555端口，中间可能不是连续的，都是与前面一样的内容
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\2.jpg)
+![](./pic-2/2.jpg)
 
 
 
@@ -41,7 +41,7 @@ ls -Slh		从文件大--->文件小
 ls -Slhr	从文件小--->文件大
 ```
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\3.jpg)
+![](./pic-2/3.jpg)
 
 
 
@@ -49,15 +49,15 @@ ls -Slhr	从文件小--->文件大
 
 后面两张图片是我用于之前测试的，忘了删除，因为前面怀疑图片隐藏信息，所以这里先忽略最后两个文件，看`ange258`
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\4.jpg)
+![](./pic-2/4.jpg)
 
 给出几个`ssh`的用户名，意思可能爆破吧，这个爆破的时候看了一下网上的wp，竟然是藏在ok手势中，我服啦。`b6e705ea1249e2bb7b0fd7dac9fcd1b3`
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\5.jpg)
+![](./pic-2/5.jpg)
 
 应该是`md5`加密，可以通过在线网站或者`kali`的`john`破解，密码`solomon1`，不过这里不知道为什么，我这里的`john`没破解出来
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\6.jpg)
+![](./pic-2/6.jpg)
 
 
 
@@ -78,13 +78,13 @@ ssh:// 是服务协议
 
 # ssh登录
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\7.jpg)
+![](./pic-2/7.jpg)
 
 
 
 登录
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\8.jpg)
+![](./pic-2/8.jpg)
 
 
 
@@ -94,7 +94,7 @@ ssh:// 是服务协议
 
 查看目录下还有一个`quite`目录，里面的文件全是字符`quite`，我以为可以`more`提权，但是不行。
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\9.jpg)
+![](./pic-2/9.jpg)
 
 
 
@@ -114,27 +114,27 @@ find / -mmin -5 -iname "*root*" -type f 2>/dev/null
 
 
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\10.jpg)
+![](./pic-2/10.jpg)
 
 
 
 查看文件获取到`root`的密码
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\11.jpg)
+![](./pic-2/11.jpg)
 
 登录root，查看`/root`目录下的文本
 
-![12](D:\stu\vulnhub\grotesque靶场\pic-2\12.jpg)
+![12](./pic-2/12.jpg)
 
 
 
 还给出了清理日志的脚本，而且也能看到，确实是在写入，搞了个循环
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\13.jpg)
+![](./pic-2/13.jpg)
 
 
 
-![](D:\stu\vulnhub\grotesque靶场\pic-2\14.jpg)
+![](./pic-2/14.jpg)
 
 
 

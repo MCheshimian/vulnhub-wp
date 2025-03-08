@@ -10,19 +10,19 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.1.1/24`即可
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\1.jpg)
+![](./pic-3/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\2.jpg)
+![](./pic-3/2.jpg)
 
 ## 网站探测
 
 访问网站，发现可能是`wordpress`，而且经过前面`shenron-2`靶机后，显示与前面相似，可能需要域名解析
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\3.jpg)
+![](./pic-3/3.jpg)
 
 查看页面源代码确定为目录下网站，且有脚本语言`php`。
 
@@ -32,19 +32,19 @@
 gobuster dir -u http://192.168.1.57 -w /usr/share/wordlists/dirb/big.txt -x php,zip,md,txt,html,jpg -b 404
 ```
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\4.jpg)
+![](./pic-3/4.jpg)
 
 访问`http://192.168.1.57/wp-admin`发现，进行跳转，需要进行域名绑定
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\6.jpg)
+![](./pic-3/6.jpg)
 
 编辑`/etc/hosts`文件，添加一条映射即可
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\7.jpg)
+![](./pic-3/7.jpg)
 
 使用`whateweb`进行指纹识别
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\5.jpg)
+![](./pic-3/5.jpg)
 
 结合目前信息来看，确定为`wordpress`，那么使用针对`wordpress`的扫描工具`wpscan`
 
@@ -52,17 +52,17 @@ gobuster dir -u http://192.168.1.57 -w /usr/share/wordlists/dirb/big.txt -x php,
 wpscan --url http://192.168.1.57
 ```
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\8.jpg)
+![](./pic-3/8.jpg)
 
 尝试枚举用户
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\9.jpg)
+![](./pic-3/9.jpg)
 
 # 漏洞寻找
 
 结合字典，尝试枚举出用户名及密码，发现用户名`admin`以及密码`iloverockyou`
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\10.jpg)
+![](./pic-3/10.jpg)
 
 也可以找`wordpress`的版本漏洞，使用`searchsploit`进行搜索
 
@@ -70,7 +70,7 @@ wpscan --url http://192.168.1.57
 searchsploit wordpress core 4.6
 ```
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\11.jpg)
+![](./pic-3/11.jpg)
 
 分析所需要的
 
@@ -97,11 +97,11 @@ ok，那就算了吧，再试都曲中人散了。
 
 发现一个`hello dolly`插件，把这个插件启用，该插件就是在页面右上角打招呼的，直接修改代码，插入`kali`自带的反弹php，在`/usr/share/webshells/php/php-reverse-shell.php`，然后在`kali`开启监听
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\13.jpg)
+![](./pic-3/13.jpg)
 
 使用`dpkg -l | grep python`查看有无安装`python`，确定为`python3`
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\14.jpg)
+![](./pic-3/14.jpg)
 
 获取交互式界面
 
@@ -118,29 +118,29 @@ find / -perm -u=s -type f 2>/dev/null
 find / -type f -executable 2>/dev/null | xargs getcap -r 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\15.jpg)
+![](./pic-3/15.jpg)
 
 查看用户情况
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\16.jpg)
+![](./pic-3/16.jpg)
 
 查看网络状态，以及系统内核版本
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\17.jpg)
+![](./pic-3/17.jpg)
 
 查看定时任务
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\18.jpg)
+![](./pic-3/18.jpg)
 
 # 提权
 
 收集一圈，未发现可用，那就把收集到的密码进行切换用户测试，最终测试成功，与爆出的密码一致
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\19.jpg)
+![](./pic-3/19.jpg)
 
 查看家目录
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\20.jpg)
+![](./pic-3/20.jpg)
 
 好嘛，这直接发现一个SUID权限的可执行文件`network`，执行发现，这很像是`netstat`，并且测试发现，用户的参数并无用处，说明是设置好的，调用这个命令
 
@@ -156,7 +156,7 @@ wget http://192.168.1.57/network
 
 在`kali`上使用`strings`等命令分析
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\21.jpg)
+![](./pic-3/21.jpg)
 
 那么更改环境变量，创建一个同名的文件，最好在`/tmp`目录
 
@@ -169,9 +169,9 @@ chmod +x netstat
 
 执行上面命令后，即可发现成功
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\22.jpg)
+![](./pic-3/22.jpg)
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\24.jpg)
+![](./pic-3/24.jpg)
 
 
 
@@ -183,11 +183,11 @@ chmod +x netstat
 sed -i "/192.168.1.16/d" auth.log
 ```
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\23.jpg)
+![](./pic-3/23.jpg)
 
 清除命令历史记录
 
-![](D:\stu\vulnhub\shenron靶场\pic-3\25.jpg)
+![](./pic-3/25.jpg)
 
 网站上，把之前的脚本文件内容复原即可
 

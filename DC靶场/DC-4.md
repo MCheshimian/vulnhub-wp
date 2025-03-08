@@ -12,19 +12,19 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.10.1/24`
 
-![](D:\stu\vulnhub\DC靶场\pic-4\1.jpg)
+![](./pic-4/1.jpg)
 
 # 信息收集 
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DC靶场\pic-4\2.jpg)
+![](./pic-4/2.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，发现是一个登录的界面，查看页面源代码，确定脚本语言为`php`
 
-![](D:\stu\vulnhub\DC靶场\pic-4\3.jpg)
+![](./pic-4/3.jpg)
 
 尝试进行目录扫描，可使用工具很多，如`gobuster、dirsearch、dirb、dirbuster、ffuf`等工具
 
@@ -34,11 +34,11 @@
 gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirb/big.txt -x php,html,txt,md -d -b 404,403
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-4\4.jpg)
+![](./pic-4/4.jpg)
 
 发现最终还是以`index.php`为主，那么尝试登录后测试数据包的形态，通过浏览器的开发者工具进行简单的了解，该请求，也就是该`form`表单是发送到`/login.php`的，并且是`post`请求，请求体中的数据只有简单的`username和pasword`，当然这里也可以尝试使用`burpsuite`进行抓取数据包进行查看
 
-![](D:\stu\vulnhub\DC靶场\pic-4\5.jpg)
+![](./pic-4/5.jpg)
 
 # 漏洞寻找
 
@@ -56,7 +56,7 @@ ffuf -c -w /usr/share/wordlists/wfuzz/Injections/All_attack.txt -u http://192.16
 
 但是这里测试发现，没有，那么可能无注入点，尝试弱密码测试
 
-![](D:\stu\vulnhub\DC靶场\pic-4\6.jpg)
+![](./pic-4/6.jpg)
 
 当然在`burpsuite`也是可以，下面采用`burp`测试
 
@@ -68,7 +68,7 @@ ffuf -c -w /usr/share/wordlists/wfuzz/Injections/All_attack.txt -u http://192.16
 
 抓取登录时的数据包，在`burp`中发送到`intruder`模块进行爆破，fuzz测试
 
-![](D:\stu\vulnhub\DC靶场\pic-4\7.jpg)
+![](./pic-4/7.jpg)
 
 从结果来看，并无有价值的信息，表示可能不存在注入点，或者说字典中可能有遗漏，这里先以不存在来说
 
@@ -76,29 +76,29 @@ ffuf -c -w /usr/share/wordlists/wfuzz/Injections/All_attack.txt -u http://192.16
 
 先针对这个进行密码爆破，因为这里并没有对登录进行限制，所以可以一直爆破，先使用`burp`专业版的内置字典进行测试，若无，再强化字典进行进一步的测试
 
-![](D:\stu\vulnhub\DC靶场\pic-4\7-2.jpg)
+![](./pic-4/7-2.jpg)
 
 这里爆破结束，进行数据长度的排序时，发现有一个数据包明显的高于其他数据包，查看后，发现在响应数据包中，提到了一串字符，你当前已经登录
 
-![](D:\stu\vulnhub\DC靶场\pic-4\7-3.jpg)
+![](./pic-4/7-3.jpg)
 
 那么就获取到了用户名`admin`和密码`happy`
 
 然后登录网站进行测试，这里第一遍登录的时候，不知道为什么没有反应，再登录一次，成功进入
 
-![](D:\stu\vulnhub\DC靶场\pic-4\8.jpg)
+![](./pic-4/8.jpg)
 
 # 漏洞利用
 
 点击`command`，发现有趣的东西，这里有三个选项，每一个代表一种命令
 
-![](D:\stu\vulnhub\DC靶场\pic-4\9.jpg)
+![](./pic-4/9.jpg)
 
 使用浏览器开发者工具，查看这里的数据，发现在这里可以看到每一个选项的值，也就是命令。
 
 尝试对其中一个进行测试，比如，列出文件，这里默认的是`ls -l`，那么修改为`ls -la`来进行测试
 
-![](D:\stu\vulnhub\DC靶场\pic-4\10.jpg)
+![](./pic-4/10.jpg)
 
 这就表示，其实网站是通过接收这里的`value`值去在其机器中执行相关命令，然后返回数据到网站
 
@@ -118,7 +118,7 @@ nc -lvvp 9999
 
 这时候，通过执行对应选项，可以看到反弹成功
 
-![](D:\stu\vulnhub\DC靶场\pic-4\11.jpg)
+![](./pic-4/11.jpg)
 
 
 
@@ -131,7 +131,7 @@ ls -l /home
 cat /etc/passwd | grep /bin/bash
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-4\12.jpg)
+![](./pic-4/12.jpg)
 
 使用`find`寻找具有SUID权限的文件，发现`sudo`，测试`sudo`发现当前不行
 
@@ -139,13 +139,13 @@ cat /etc/passwd | grep /bin/bash
 find - perm -4000 -print 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-4\13.jpg)
+![](./pic-4/13.jpg)
 
 ## 提权至jim用户
 
 不过看到在`/home/jim`下，有一个SUID权限文件，去查看，发现该脚本虽然具有SUID权限，但是所有者是`jim`，不过在观察时，发现该目录下，有一个备份文件夹，至少名称是这样的，查看该目录下的文件，发现一个密码本
 
-![](D:\stu\vulnhub\DC靶场\pic-4\14.jpg)
+![](./pic-4/14.jpg)
 
 既然是在用户`jim`下，就使用这个密码本对其用户进行`ssh`爆破，当然，需要把这个密码本中的内容，复制到`kali`中，过了一会就发现成功获取到一组密码
 
@@ -153,21 +153,21 @@ find - perm -4000 -print 2>/dev/null
 hydra -l jim -p pass.txt 192.168.10.11 ssh
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-4\15.jpg)
+![](./pic-4/15.jpg)
 
 用户名`jim`和密码`jibril04`，尝试登录`ssh`，登录成功
 
-![](D:\stu\vulnhub\DC靶场\pic-4\16.jpg)
+![](./pic-4/16.jpg)
 
 ## 提权至root用户
 
 使用`find`寻找具有SUID权限的文件，发现`exim4`
 
-![](D:\stu\vulnhub\DC靶场\pic-4\17.jpg)
+![](./pic-4/17.jpg)
 
 再查看当前目录下的一个文件，之前没有看，发现是一个邮件信息，但是其中包括了`exim`的版本信息
 
-![](D:\stu\vulnhub\DC靶场\pic-4\18.jpg)
+![](./pic-4/18.jpg)
 
 再次执行命令，查看确切的版本信息
 
@@ -175,7 +175,7 @@ hydra -l jim -p pass.txt 192.168.10.11 ssh
 /usr/sbin/exim4 --version
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-4\19.jpg)
+![](./pic-4/19.jpg)
 
 尝试使用`searchsploit`搜索有无相关提权漏洞
 
@@ -183,11 +183,11 @@ hydra -l jim -p pass.txt 192.168.10.11 ssh
 searchsploit exim 4.8 privilege
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-4\20.jpg)
+![](./pic-4/20.jpg)
 
 把脚本复制到`kali`当前目录下
 
-![](D:\stu\vulnhub\DC靶场\pic-4\21.jpg)
+![](./pic-4/21.jpg)
 
 查看脚本内容，里面有脚本用法，必须是本地，也就是需要传送到靶机内，并且该脚本有两种执行方法
 
@@ -197,7 +197,7 @@ searchsploit exim 4.8 privilege
 ./46996.sh -m netcat
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-4\22.jpg)
+![](./pic-4/22.jpg)
 
 在`kali`中使用`scp`命令，传输文件，因为已经登录了`ssh`，所以，一般`scp`都是可用的
 
@@ -209,21 +209,21 @@ scp ./46996.sh jim@192.168.10.11:/tmp
 
 在靶机内切换到`/tmp`目录，然后执行其中的一种方式，发现提权成功
 
-![](D:\stu\vulnhub\DC靶场\pic-4\23.jpg)
+![](./pic-4/23.jpg)
 
 再测试另一种方式，都是可以提权成功的
 
-![](D:\stu\vulnhub\DC靶场\pic-4\24.jpg)
+![](./pic-4/24.jpg)
 
 查看`flag`
 
-![](D:\stu\vulnhub\DC靶场\pic-4\25.jpg)
+![](./pic-4/25.jpg)
 
 # 清理痕迹
 
 把`/var/log`下的一些日志文件清理即可，这里需要主要，网站不再是`apache2`的，而是`nginx`
 
-![](D:\stu\vulnhub\DC靶场\pic-4\26.jpg)
+![](./pic-4/26.jpg)
 
 然后把历史命令清理即可
 

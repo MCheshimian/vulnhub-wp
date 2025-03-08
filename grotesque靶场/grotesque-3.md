@@ -10,7 +10,7 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.1.1/24`搜索
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\1.jpg)
+![](./pic-3/1.jpg)
 
 
 
@@ -20,7 +20,7 @@
 
 防止有遗漏，再扫描全端口
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\2.jpg)
+![](./pic-3/2.jpg)
 
 
 
@@ -28,17 +28,17 @@
 
 访问80界面，有个超链接，查看页面源代码
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\3.jpg)
+![](./pic-3/3.jpg)
 
 是定位的另一个图片
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\4.jpg)
+![](./pic-3/4.jpg)
 
 
 
 访问后，是这样的一张图片
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\5.jpg)
+![](./pic-3/5.jpg)
 
 
 
@@ -48,7 +48,7 @@
 
 寻找一番，这里可能是提示，`md5`加密
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\6.jpg)
+![](./pic-3/6.jpg)
 
 假设网站目录都`md5`加密，那么就需要把目录字典，进行`md5`加密
 
@@ -66,7 +66,7 @@ awk '{sub(/  -$/,"");print}' dirmd5.txt >1.txt &&mv 1.txt dirmd5.txt
 
 
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\7.jpg)
+![](./pic-3/7.jpg)
 
 
 
@@ -82,11 +82,11 @@ ffuf -w /usr/share/wordlists/dirb/big.txt -u http://192.168.1.44/f66b22bf020334b
 
 过滤掉返回没有字节的，剩下的可能就是参数
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\8.jpg)
+![](./pic-3/8.jpg)
 
 说明文件包含是有的，那么测试路径遍历是否可行
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\9.jpg)
+![](./pic-3/9.jpg)
 
 
 
@@ -114,23 +114,23 @@ http://192.168.1.44/f66b22bf020334b04c7d0d3eb5010391.php?purpose=php://filter/re
 hydra -l freddie -P dirmd5.txt -vV -f ssh://192.168.1.44
 ```
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\10.jpg)
+![](./pic-3/10.jpg)
 
 爆破成功，用户`freddie`，密码`61a4e3e60c063d1e472dd780f64e6cad`
 
 # 使用ssh登录
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\11.jpg)
+![](./pic-3/11.jpg)
 
 去`.ssh`看下，发现确实是没有权限读取
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\12.jpg)
+![](./pic-3/12.jpg)
 
 # 提权
 
 尝试使用`find`寻找具有SUID的文件，没有可直接利用的
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\13.jpg)
+![](./pic-3/13.jpg)
 
 
 
@@ -140,13 +140,13 @@ hydra -l freddie -P dirmd5.txt -vV -f ssh://192.168.1.44
 
 只有一个网络地址，没有容器
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\14.jpg)
+![](./pic-3/14.jpg)
 
 
 
 发现两个本地开放的端口
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\15.jpg)
+![](./pic-3/15.jpg)
 
 ## smb利用
 
@@ -162,11 +162,11 @@ smbclient -L //地址
 
 这里因为不知道密码，所以是直接回车的，没想到不需要密码
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\16.jpg)
+![](./pic-3/16.jpg)
 
 连接指定的共享进行查看
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\17.jpg)
+![](./pic-3/17.jpg)
 
 
 
@@ -178,23 +178,23 @@ smbclient -L //地址
 
 然后传输到靶机上，这里是采用`scp`，上传是文件在地址前，下载是地址在文件前
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\18.jpg)
+![](./pic-3/18.jpg)
 
 在靶机上运行该文件，首先使用`chmod`加执行权限，然后直接运行即可进行监听
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\19.jpg)
+![](./pic-3/19.jpg)
 
 发现有使用`sh`执行`smbshare`中的所有文件，进一步观察，发现一分钟执行一次
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\19-1.jpg)
+![](./pic-3/19-1.jpg)
 
 查看这个目录，大概率就是SMB的共享路径
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\20.jpg)
+![](./pic-3/20.jpg)
 
 搞一个反弹`shell`，写入文档，然后上传进文件夹中，直接在这个文件夹中编辑没有权限
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\21.jpg)
+![](./pic-3/21.jpg)
 
 
 
@@ -202,13 +202,13 @@ smbclient -L //地址
 
 # 清除痕迹
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\22.jpg)
+![](./pic-3/22.jpg)
 
-![](D:\stu\vulnhub\grotesque靶场\pic-3\23.jpg)
+![](./pic-3/23.jpg)
 
-![24](D:\stu\vulnhub\grotesque靶场\pic-3\24.jpg)
+![24](./pic-3/24.jpg)
 
-![25](D:\stu\vulnhub\grotesque靶场\pic-3\25.jpg)
+![25](./pic-3/25.jpg)
 
 
 

